@@ -6,7 +6,7 @@ CROSS_COMPILE=/usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
 #指定适用于C语言的编译器
 CC=$(CROSS_COMPILE)gcc
 #指定适用于C++语言的编译器
-CXX=CC=$(CROSS_COMPILE)g++
+CXX=$(CROSS_COMPILE)g++
 #指定后处理器
 STRIP=$(CROSS_COMPILE)strip
 
