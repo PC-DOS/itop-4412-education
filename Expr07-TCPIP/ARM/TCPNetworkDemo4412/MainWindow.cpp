@@ -14,6 +14,11 @@ MainWindow::MainWindow(QWidget *parent, QString sHostIP, quint16 iHostPort) :
     tcpDataClient=new TCPClient;
     connect(tcpDataClient, SIGNAL(ResponseReceivedFromServerEvent(QString)), this, SLOT(ResponseReceivedEventHandler(QString)), Qt::QueuedConnection);
 
+    /* Heart Beat Timer */
+    tmrHeartBeat=new QTimer(this);
+    connect(tmrHeartBeat, SIGNAL(timeout()), this, SLOT(tmrHeartBeat_Tick()));
+    tmrHeartBeat->start(5000);
+
     /* Establish connection */
     if (sHostIP==""){
         sHostIP=tcpDataClient->GetServerIP();
@@ -25,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent, QString sHostIP, quint16 iHostPort) :
 }
 
 MainWindow::~MainWindow(){
+    tmrHeartBeat->stop();
+    delete tmrHeartBeat;
+
     /* Delete TCP Client Object */
     delete tcpDataClient;
     delete ui;
@@ -52,10 +60,27 @@ void MainWindow::on_btnSend_clicked(){
             tcpDataClient->SendDataToServer();
         }
     }
+    else{
+        tcpDataClient->QueueDataFrame("<EMPTY TEXT>");
+        WriteLog("Me @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
+        WriteLog("<EMPTY TEXT>", true);
+        if (tcpDataClient->IsConnected()){
+            tcpDataClient->SendDataToServer();
+        }
+    }
     return;
 }
 
 void MainWindow::on_btnClose_clicked(){
     QApplication::quit();
     return;
+}
+
+void MainWindow::tmrHeartBeat_Tick(){
+    tcpDataClient->QueueDataFrame("<HEART BEAT MESSAGE>");
+    WriteLog("Me @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
+    WriteLog("<HEART BEAT MESSAGE>", true);
+    if (tcpDataClient->IsConnected()){
+        tcpDataClient->SendDataToServer();
+    }
 }

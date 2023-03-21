@@ -16,13 +16,4 @@
 #include "NetworkingControlInterface.Client.h"
 #include "NetworkingControlInterface.Server.h"
 
-/* AT Commands */
-#define AT_CMD_SET_SYSGAIN "SETSYSGAIN"
-#define AT_CMD_SET_REFGAIN "SETREFGAIN"
-#define AT_CMD_SET_DISTANCE "SETDISTANCE"
-#define AT_CMD_SET_DELAY "SETDELAY"
-#define AT_CMD_SET_OFFSET "SETOFFSET"
-#define AT_CMD_SET_VELOCITY "SETVELOCITY"
-#define AT_CMD_SET_ANGLE "SETANGLE"
-
 #endif // NETWORKINGCONTROLINTERFACE_H

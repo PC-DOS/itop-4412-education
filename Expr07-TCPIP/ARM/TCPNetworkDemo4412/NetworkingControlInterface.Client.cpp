@@ -15,6 +15,11 @@ TCPClient * tcpDataClient;
 
 /* TCP Networking Data Sending Thread Worker Object */
 TCPClientDataSender::TCPClientDataSender(){
+    //Initialize internal variables
+    _IsDataSending=false;
+    _IsUserInitiatedDisconnection=false;
+    _IsReconnecting=false;
+
     //Create TCP socket object and connect events
     connect(this, SIGNAL(connected()), this, SLOT(TCPClientDataSender_Connected()), Qt::QueuedConnection);
     connect(this, SIGNAL(disconnected()), this, SLOT(TCPClientDataSender_Disconnected()), Qt::QueuedConnection);
@@ -32,6 +37,7 @@ void TCPClientDataSender::ConnectToServerEventHandler(const QString sServerIP, q
     _iPort=iPort;
     _IsAutoReconnectEnabled=IsAutoReconnectEnabled;
     _iAutoReconnectDelay=iAutoReconnectDelay;
+    _IsUserInitiatedDisconnection=false;
 
     connectToHost(sServerIP, iPort);
     if (WairForOperationToComplete){
@@ -43,6 +49,8 @@ void TCPClientDataSender::ConnectToServerEventHandler(const QString sServerIP, q
 
 void TCPClientDataSender::DisconnectFromServerEventHandler(bool WairForOperationToComplete){
     disconnectFromHost();
+    _IsUserInitiatedDisconnection=true;
+    _IsReconnecting=false;
     if (WairForOperationToComplete){
         waitForDisconnected();
     }
@@ -56,6 +64,16 @@ void TCPClientDataSender::SetAutoReconnectOptionsEventHandler(bool IsAutoReconne
 }
 
 void TCPClientDataSender::SendDataToServerEventHandler(){
+    //Check if SendDataToServerEventHandler() is running, avoid recursive calling of SendDataToServerEventHandler() and segmentation faults
+    if (_IsDataSending){
+        //If this is a recursive calling, simply returns
+        return;
+    }
+    else{
+        //Marks SendDataToServerEventHandler() is running
+        _IsDataSending=true;
+    }
+
     while (!queDataFramesPendingSending.empty() && state()==QTcpSocket::ConnectedState){ //Sends all queued data frames to remote
         QString * frmCurrentSendingDataFrame = NULL;
 
@@ -88,6 +106,7 @@ void TCPClientDataSender::SendDataToServerEventHandler(){
 /* TCP Socket Event Handler Slots */
 void TCPClientDataSender::TCPClientDataSender_Connected(){
     qDebug()<<"TCPClient: Connected to"<<_sServerIP<<":"<<_iPort;
+    _IsReconnecting=false;
     return;
 }
 
@@ -97,17 +116,15 @@ void TCPClientDataSender::TCPClientDataSender_Disconnected(){
 }
 
 void TCPClientDataSender::TCPClientDataSender_Error(QAbstractSocket::SocketError errErrorInfo){
-    qDebug()<<"TCPClient: Error:"<<errErrorInfo;
-    disconnectFromHost();
-    for (int i = 0; i <= INT_MAX; ++i){ //Manually implies WaitForDisonnected;
-        if (state()==QTcpSocket::UnconnectedState){ //Check if we have disconnected
-            break;
-        }
-        QApplication::processEvents(); //Call QApplication::processEvents() to process event loop (Avoid jamming main thread)
+    qDebug()<<"TCPClient: Error"<<errErrorInfo<<": "<<errorString();
+    if (state() != QTcpSocket::UnconnectedState){
+        disconnectFromHost();
+        waitForDisconnected(245000);
     }
-    if (_IsAutoReconnectEnabled){ //Check if we need to reconnect
+    if (_IsAutoReconnectEnabled && !_IsReconnecting && !_IsUserInitiatedDisconnection){ //Check if we need to reconnect
         qDebug()<<"TCPClient: Will retry connect after"<<_iAutoReconnectDelay<<"ms";
         QTimer::singleShot(_iAutoReconnectDelay, this, SLOT(TryReconnect()));
+        _IsReconnecting=true;
     }
     return;
 }
@@ -125,23 +142,19 @@ void TCPClientDataSender::TCPClientDataSender_ReadyRead(){
 
 /* Functional Slots */
 void TCPClientDataSender::TryReconnect(){
-    qDebug()<<"TCPClient: Retrying to connect to"<<_sServerIP<<":"<<_iPort;
-    connectToHost(_sServerIP, _iPort);
-    for (int i = 0; i <= INT_MAX; ++i){ //Manually implies WaitForConnected;
-        if (state()==QTcpSocket::ConnectedState){ //Check if we have connected
-            qDebug()<<"TCPClient: Reconnected to"<<_sServerIP<<":"<<_iPort;
-            break;
-        }
-        QApplication::processEvents(); //Call QApplication::processEvents() to process event loop (Avoid jamming main thread)
+    if (_IsUserInitiatedDisconnection){
+        return;
     }
-    if (state()!=QTcpSocket::ConnectedState){
+    if (state() != QTcpSocket::ConnectingState && state() != QTcpSocket::ConnectedState){
+        qDebug()<<"TCPClient: Retrying to connect to"<<_sServerIP<<":"<<_iPort;
+        connectToHost(_sServerIP, _iPort);
+        waitForConnected(245000);
+    }
+    if (state() != QTcpSocket::ConnectedState){
         qDebug()<<"TCPClient: Will retry connect after"<<_iAutoReconnectDelay<<"ms";
-        disconnectFromHost();
-        for (int i = 0; i <= INT_MAX; ++i){ //Manually implies WaitForDisonnected;
-            if (state()==QTcpSocket::UnconnectedState){ //Check if we have disconnected
-                break;
-            }
-            QApplication::processEvents(); //Call QApplication::processEvents() to process event loop (Avoid jamming main thread)
+        if (state() != QTcpSocket::UnconnectedState){
+            disconnectFromHost();
+            waitForDisconnected(245000);
         }
         QTimer::singleShot(_iAutoReconnectDelay, this, SLOT(TryReconnect()));
     }
@@ -276,7 +289,9 @@ void TCPClient::QueueDataFrame(const QString &sData){
     mtxDataFramesPendingSendingLock.lock(); //Begin writing internal buffer
 
     if (queDataFramesPendingSending.size()>NET_DATA_QUEUE_MAX_ITEM_COUNT){
-        queDataFramesPendingSending.clear();
+        while (!queDataFramesPendingSending.empty()){
+            delete queDataFramesPendingSending.dequeue();
+        }
         qDebug()<<"TCPClient: Data queue has been purged because it has exceeded the size limit.";
     }
 
