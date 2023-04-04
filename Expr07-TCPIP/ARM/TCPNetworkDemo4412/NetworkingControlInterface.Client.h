@@ -39,11 +39,11 @@ public:
 
 public slots:
     /* Connection Management Command Handlers */
-    void ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
-                                     bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
-    void DisconnectFromServerEventHandler(bool bWairForOperationToComplete);
-    void SetAutoReconnectOptionsEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
-    void SendDataToServerEventHandler();
+    void ConnectToServerRequestedEventHandler(const QString sServerIPNew, quint16 iPortNew,
+                                              bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
+    void DisconnectFromServerRequestedEventHandler(bool bWairForOperationToComplete);
+    void SetAutoReconnectOptionsRequestedEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
+    void SendDataToServerRequestedEventHandler();
 
     /* TCP Socket Event Handler Slots */
     void TCPClientDataSender_Connected();
@@ -64,7 +64,7 @@ private:
     unsigned int iAutoReconnectDelay; //INTERNAL: Auto reconnect retry interval
     bool bIsUserInitiatedDisconnection; //INTERNAL: Marks if user has initiated a disconnection, to avoid unexpected TryReconnect() flooding
     bool bIsReconnecting; //INTERNAL: Marks if we are alreading waiting a reconnection, to avoid unexpected TryReconnect() flooding
-    bool bIsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerEventHandler() and segmentation faults
+    bool bIsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerRequestedEventHandler() and segmentation faults
 };
 
 /* TCP Networking Client Wrapper */
@@ -113,11 +113,11 @@ public slots:
 
 signals:
     /* Signals to Communicate with Worker Object */
-    void ConnectToServerEvent(const QString sServerIPNew, quint16 iPortNew,
-                              bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
-    void DisconnectFromServerEvent(bool bWairForOperationToComplete);
-    void SetAutoReconnectOptionsEvent(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
-    void SendDataToServerEvent();
+    void ConnectToServerRequestedEvent(const QString sServerIPNew, quint16 iPortNew,
+                                       bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
+    void DisconnectFromServerRequestedEvent(bool bWairForOperationToComplete);
+    void SetAutoReconnectOptionsRequestedEvent(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
+    void SendDataToServerRequestedEvent();
 
     /* Signals to Communicate with Upper Layer */
     void ResponseReceivedFromServerEvent(QString sResponse);

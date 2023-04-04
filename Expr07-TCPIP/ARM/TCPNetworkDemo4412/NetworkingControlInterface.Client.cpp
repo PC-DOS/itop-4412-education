@@ -37,8 +37,8 @@ bool TCPClientDataSender::IsDataSending() const{
 }
 
 /* Connection Management Command Handlers */
-void TCPClientDataSender::ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
-                                                      bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete){
+void TCPClientDataSender::ConnectToServerRequestedEventHandler(const QString sServerIPNew, quint16 iPortNew,
+                                                               bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete){
     sServerIP=sServerIPNew;
     iPort=iPortNew;
     bIsAutoReconnectEnabled=bIsAutoReconnectEnabledNew;
@@ -53,7 +53,7 @@ void TCPClientDataSender::ConnectToServerEventHandler(const QString sServerIPNew
     return;
 }
 
-void TCPClientDataSender::DisconnectFromServerEventHandler(bool bWairForOperationToComplete){
+void TCPClientDataSender::DisconnectFromServerRequestedEventHandler(bool bWairForOperationToComplete){
     disconnectFromHost();
     bIsUserInitiatedDisconnection=true;
     bIsReconnecting=false;
@@ -63,20 +63,20 @@ void TCPClientDataSender::DisconnectFromServerEventHandler(bool bWairForOperatio
     return;
 }
 
-void TCPClientDataSender::SetAutoReconnectOptionsEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew){
+void TCPClientDataSender::SetAutoReconnectOptionsRequestedEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew){
     bIsAutoReconnectEnabled=bIsAutoReconnectEnabledNew;
     iAutoReconnectDelay=iAutoReconnectDelayNew;
     return;
 }
 
-void TCPClientDataSender::SendDataToServerEventHandler(){
-    //Check if SendDataToServerEventHandler() is running, avoid recursive calling of SendDataToServerEventHandler() and segmentation faults
+void TCPClientDataSender::SendDataToServerRequestedEventHandler(){
+    //Check if SendDataToServerRequestedEventHandler() is running, avoid recursive calling of SendDataToServerRequestedEventHandler() and segmentation faults
     if (bIsDataSending){
         //If this is a recursive calling, simply returns
         return;
     }
     else{
-        //Marks SendDataToServerEventHandler() is running
+        //Marks SendDataToServerRequestedEventHandler() is running
         bIsDataSending=true;
     }
 
@@ -182,10 +182,10 @@ TCPClient::TCPClient(){
     tcpDataSender->moveToThread(trdTCPDataSender);
 
     //Connect events and handlers
-    connect(this, SIGNAL(ConnectToServerEvent(QString,quint16,bool,unsigned int,bool)), tcpDataSender, SLOT(ConnectToServerEventHandler(QString,quint16,bool,unsigned int,bool)));
-    connect(this, SIGNAL(DisconnectFromServerEvent(bool)), tcpDataSender, SLOT(DisconnectFromServerEventHandler(bool)));
-    connect(this, SIGNAL(SetAutoReconnectOptionsEvent(bool,uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsEventHandler(bool,uint)));
-    connect(this, SIGNAL(SendDataToServerEvent()), tcpDataSender, SLOT(SendDataToServerEventHandler()));
+    connect(this, SIGNAL(ConnectToServerRequestedEvent(QString,quint16,bool,unsigned int,bool)), tcpDataSender, SLOT(ConnectToServerRequestedEventHandler(QString,quint16,bool,unsigned int,bool)));
+    connect(this, SIGNAL(DisconnectFromServerRequestedEvent(bool)), tcpDataSender, SLOT(DisconnectFromServerRequestedEventHandler(bool)));
+    connect(this, SIGNAL(SetAutoReconnectOptionsRequestedEvent(bool,uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsRequestedEventHandler(bool,uint)));
+    connect(this, SIGNAL(SendDataToServerRequestedEvent()), tcpDataSender, SLOT(SendDataToServerRequestedEventHandler()));
     connect(tcpDataSender, SIGNAL(SocketResponseReceivedFromServerEvent(QString)), this, SLOT(SocketResponseReceivedFromServerEventHandler(QString)));
     connect(tcpDataSender, SIGNAL(connected()), this, SIGNAL(ConnectedToServerEvent()));
     connect(tcpDataSender, SIGNAL(disconnected()), this, SIGNAL(DisconnectedFromServerEvent()));
@@ -212,10 +212,10 @@ TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
     tcpDataSender->moveToThread(trdTCPDataSender);
 
     //Connect events and handlers
-    connect(this, SIGNAL(ConnectToServerEvent(QString,quint16,bool,unsigned int,bool)), tcpDataSender, SLOT(ConnectToServerEventHandler(QString,quint16,bool,unsigned int,bool)));
-    connect(this, SIGNAL(DisconnectFromServerEvent(bool)), tcpDataSender, SLOT(DisconnectFromServerEventHandler(bool)));
-    connect(this, SIGNAL(SetAutoReconnectOptionsEvent(bool,uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsEventHandler(bool,uint)));
-    connect(this, SIGNAL(SendDataToServerEvent()), tcpDataSender, SLOT(SendDataToServerEventHandler()));
+    connect(this, SIGNAL(ConnectToServerRequestedEvent(QString,quint16,bool,unsigned int,bool)), tcpDataSender, SLOT(ConnectToServerRequestedEventHandler(QString,quint16,bool,unsigned int,bool)));
+    connect(this, SIGNAL(DisconnectFromServerRequestedEvent(bool)), tcpDataSender, SLOT(DisconnectFromServerRequestedEventHandler(bool)));
+    connect(this, SIGNAL(SetAutoReconnectOptionsRequestedEvent(bool,uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsRequestedEventHandler(bool,uint)));
+    connect(this, SIGNAL(SendDataToServerRequestedEvent()), tcpDataSender, SLOT(SendDataToServerRequestedEventHandler()));
     connect(tcpDataSender, SIGNAL(SocketResponseReceivedFromServerEvent(QString)), this, SLOT(SocketResponseReceivedFromServerEventHandler(QString)));
     connect(tcpDataSender, SIGNAL(connected()), this, SIGNAL(ConnectedToServerEvent()));
     connect(tcpDataSender, SIGNAL(disconnected()), this, SIGNAL(DisconnectedFromServerEvent()));
@@ -272,7 +272,7 @@ quint16 TCPClient::GetServerPort() const{
 }
 
 void TCPClient::ConnectToServer(bool bWairForOperationToComplete){
-    emit ConnectToServerEvent(sServerIP,iPort,bIsAutoReconnectEnabled,iAutoReconnectDelay,bWairForOperationToComplete);
+    emit ConnectToServerRequestedEvent(sServerIP,iPort,bIsAutoReconnectEnabled,iAutoReconnectDelay,bWairForOperationToComplete);
     return;
 }
 
@@ -286,12 +286,12 @@ void TCPClient::ConnectToServer(const QString sServerIPNew, quint16 iPortNew,
     TCPClient::SaveSettings();
 
     //Connect
-    emit ConnectToServerEvent(sServerIP,iPort,bIsAutoReconnectEnabled,iAutoReconnectDelay,bWairForOperationToComplete);
+    emit ConnectToServerRequestedEvent(sServerIP,iPort,bIsAutoReconnectEnabled,iAutoReconnectDelay,bWairForOperationToComplete);
     return;
 }
 
 void TCPClient::DisconnectFromServer(bool bWairForOperationToComplete){
-    emit DisconnectFromServerEvent(bWairForOperationToComplete);
+    emit DisconnectFromServerRequestedEvent(bWairForOperationToComplete);
     return;
 }
 
@@ -300,7 +300,7 @@ void TCPClient::SendDataToServer(){
     if (tcpDataSender->IsDataSending()){
         return;
     }
-    emit SendDataToServerEvent();
+    emit SendDataToServerRequestedEvent();
     return;
 }
 
@@ -326,7 +326,7 @@ void TCPClient::QueueDataFrame(const QString &sData){
 void TCPClient::SetAutoReconnectMode(bool bIsAutoReconnectEnabledNew){
     bIsAutoReconnectEnabled=bIsAutoReconnectEnabledNew;
     TCPClient::SaveSettings();
-    emit SetAutoReconnectOptionsEvent(bIsAutoReconnectEnabled,iAutoReconnectDelay);
+    emit SetAutoReconnectOptionsRequestedEvent(bIsAutoReconnectEnabled,iAutoReconnectDelay);
     return;
 }
 
@@ -337,7 +337,7 @@ bool TCPClient::GetIsAutoReconnectEnabled() const{
 void TCPClient::SetAutoReconnectDelay(unsigned int iAutoReconnectDelayNew){
     iAutoReconnectDelay=iAutoReconnectDelayNew;
     TCPClient::SaveSettings();
-    emit SetAutoReconnectOptionsEvent(bIsAutoReconnectEnabled,iAutoReconnectDelay);
+    emit SetAutoReconnectOptionsRequestedEvent(bIsAutoReconnectEnabled,iAutoReconnectDelay);
     return;
 }
 
