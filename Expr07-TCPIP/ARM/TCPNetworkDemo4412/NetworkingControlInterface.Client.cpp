@@ -200,7 +200,7 @@ TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
     //Save settings
     sServerIP=sServerIPNew;
     iPort=iPortNew;
-    bIsAutoReconnectEnabled=IsAutoReconnectEnabledNew;
+    bIsAutoReconnectEnabled=bIsAutoReconnectEnabledNew;
     iAutoReconnectDelay=iAutoReconnectDelayNew;
     TCPClient::SaveSettings();
 
