@@ -40,7 +40,7 @@ public:
 public slots:
     /* Connection Management Command Handlers */
     void ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
-                                     bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToCompleteNew);
+                                     bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
     void DisconnectFromServerEventHandler(bool bWairForOperationToComplete);
     void SetAutoReconnectOptionsEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerEventHandler();
