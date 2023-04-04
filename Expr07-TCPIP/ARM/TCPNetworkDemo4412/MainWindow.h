@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "NetworkingControlInterface.h"
 #include <QMainWindow>
 #include <QTimer>
 
@@ -22,13 +23,20 @@ private:
     QTimer * tmrHeartBeat;
 
 private slots:
-    /* Response from Server Handler */
+    /* Networking Events Handler */
+    void ConnectedToServerEventHandler();
+    void DisconnectedFromServerEventHandler();
+    void NetworkingErrorEventHandler(QAbstractSocket::SocketError errErrorInfo);
     void ResponseReceivedEventHandler(QString sResponse);
-    void on_btnSend_clicked();
-    void on_btnClose_clicked();
+    void ClientConnectedEventHandler(QString sClientIPAddress, quint16 iClientPort);
+    void DataReceivedFromClientEventHandler(QString sData, QString sClientIPAddress, quint16 iClientPort);
 
     /* Heart Beat Timer Slot */
     void tmrHeartBeat_Tick();
+
+    /* Widget Intercation Events */
+    void on_btnSend_clicked();
+    void on_btnClose_clicked();
 };
 
 #endif // MAINWINDOW_H

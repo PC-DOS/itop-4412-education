@@ -17,14 +17,35 @@ TCPServerSocket::TCPServerSocket() {
 TCPServerSocket::~TCPServerSocket() {
 }
 
+/* Text-Based Communication */
+void TCPServerSocket::SendDataToClientRequestedEventHandler(QString sDataToSend) {
+    /*
+    //Add line separator, using Windows mode ("\r\n")
+    if (!sDataToSend.endsWith("\r\n")){
+        if (sDataToSend.endsWith('\r')){
+            sDataToSend+='\n';
+        }
+        else if (sDataToSend.endsWith('\n')){
+            sDataToSend.insert(sDataToSend.length()-1, '\r');
+        }
+        else{
+            sDataToSend+="\r\n";
+        }
+    }
+    */
+    //Send text to remote, using UTF-8
+    write(sDataToSend.toUtf8());
+    return;
+}
+
 /* Command Incoming Event Handler Slot */
 void TCPServerSocket::CommandReceivedFromClientEventHandler() {
     while (bytesAvailable()) {
         //Read a command line and emit a signal
-        emit SocketCommandReceivedFromClientEvent(readLine());
+        emit SocketCommandReceivedFromClientEvent(readLine(), peerAddress().toString(), peerPort());
 
         //Process events
-        QApplication::processEvents();
+        //QApplication::processEvents();
     }
     return;
 }
@@ -43,7 +64,7 @@ void TCPServerSocket::TCPServerSocket_Disconnected() {
 
 void TCPServerSocket::TCPServerSocket_Error(QAbstractSocket::SocketError errErrorInfo) {
     qDebug() << "TCPServer: Error" << errErrorInfo << "occurred, connection aborted.";
-    disconnect();
+    this->deleteLater(); //Delete this object safely
     return;
 }
 
@@ -64,8 +85,26 @@ TCPServer::~TCPServer() {
     TCPServer::SaveSettings();
 
     //Close server
-    TCPServer::StopListening();
+    if (isListening()) {
+        TCPServer::StopListening();
+    }
 }
+
+/* Options Management */
+void TCPServer::LoadSettings() {
+    SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
+    iListeningPort = SettingsContainer.value(ST_KEY_LISTENING_PORT, ST_DEFVAL_LISTENING_PORT).toUInt();
+    SettingsContainer.endGroup();
+    return;
+}
+
+void TCPServer::SaveSettings() const {
+    SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
+    SettingsContainer.setValue(ST_KEY_LISTENING_PORT, iListeningPort);
+    SettingsContainer.endGroup();
+    return;
+}
+
 
 /* Listening Status Management */
 bool TCPServer::StartListening() {
@@ -103,10 +142,15 @@ void TCPServer::StopListening() {
     return;
 }
 
+/* Text-Based Communication */
+void TCPServer::SendDataToClient(QString sDataToSend) {
+    emit SendDataToClientRequestedEvent(sDataToSend);
+}
+
 /* Command Incoming Event Handler Slot */
-void TCPServer::SocketCommandReceivedFromClientEventHandler(QString sCommand) {
+void TCPServer::SocketCommandReceivedFromClientEventHandler(QString sCommand, QString sClientIP, quint16 iClientPort) {
     qDebug() << "TCPServer: Command" << sCommand << "received from the remote";
-    emit CommandReceivedEvent(sCommand);
+    emit CommandReceivedEvent(sCommand, sClientIP, iClientPort);
     return;
 }
 
@@ -117,22 +161,11 @@ void TCPServer::incomingConnection(int iSocketID) {
     tcpSocket->setSocketDescriptor(iSocketID);
 
     //Connect events and handlers
-    connect(tcpSocket, SIGNAL(SocketCommandReceivedEvent(QString)), this, SLOT(SocketCommandReceivedFromClientEventHandler(QString)));
+    connect(tcpSocket, SIGNAL(SocketCommandReceivedFromClientEvent(QString, QString, quint16)), this, SLOT(SocketCommandReceivedFromClientEventHandler(QString, QString, quint16)));
+    connect(this, SIGNAL(SendDataToClientRequestedEvent(QString)), tcpSocket, SLOT(SendDataToClientRequestedEventHandler(QString)));
 
-    return;
-}
+    //Inform upper layer
+    emit ClientConnectedEvent(tcpSocket->peerAddress().toString(), tcpSocket->peerPort());
 
-/* Options Management */
-void TCPServer::LoadSettings() {
-    SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
-    iListeningPort = SettingsContainer.value(ST_KEY_LISTENING_PORT, ST_DEFVAL_LISTENING_PORT).toUInt();
-    SettingsContainer.endGroup();
-    return;
-}
-
-void TCPServer::SaveSettings() const {
-    SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
-    SettingsContainer.setValue(ST_KEY_LISTENING_PORT, iListeningPort);
-    SettingsContainer.endGroup();
     return;
 }

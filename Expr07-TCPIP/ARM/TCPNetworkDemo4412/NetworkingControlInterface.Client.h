@@ -103,10 +103,6 @@ public:
     bool IsValidIPAddress(const QString sIPAddress) const; //Check if the given address is valid
     bool IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly = true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if RegisteredPortsOnly is true)
 
-    /* Threads & Worker Objects */
-    QThread * trdTCPDataSender; //Thread which is used to host and control worker thread
-    TCPClientDataSender * tcpDataSender; //Worker object
-
 public slots:
     /* Worker Object Event Handler */
     void SocketResponseReceivedFromServerEventHandler(QString sResponse);
@@ -127,7 +123,11 @@ signals:
 
 private:
     /* Connection Management */
-    //volatile bool _IsConnected; //INTERNAL: Get if we have connected to remote server. Not used, use tcpDataSnder->tcpSocket->state() instead.
+    //volatile bool bIsConnected; //INTERNAL: Get if we have connected to remote server. Not used, use tcpDataSnder->tcpSocket->state() instead.
+
+    /* Threads & Worker Objects */
+    QThread * trdTCPDataSender; //Thread which is used to host and control worker thread
+    TCPClientDataSender * tcpDataSender; //Worker object
 
     /* Options Var */
     QString sServerIP; //INTERNAL: Remote IP Address

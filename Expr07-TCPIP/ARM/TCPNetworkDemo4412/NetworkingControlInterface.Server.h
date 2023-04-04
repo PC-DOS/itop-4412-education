@@ -35,8 +35,12 @@ public:
     TCPServerSocket();
     ~TCPServerSocket();
 
+public slots:
+    /* Text-Based Communication */
+    void SendDataToClientRequestedEventHandler(QString sDataToSend); //Send data to client
+
 signals:
-    void SocketCommandReceivedFromClientEvent(QString sCommand); //Signal that informs the TCP Server Object a command received from the remote client
+    void SocketCommandReceivedFromClientEvent(QString sCommand, QString sClientIP, quint16 iClientPort); //Signal that informs the TCP Server Object a command received from the remote client
 
 private slots:
     /* Command Incoming Event Handler Slot */
@@ -57,17 +61,29 @@ public:
     TCPServer(quint16 iListeningPortInit); //Construct the object with a given listening port
     ~TCPServer();
 
+    /* Options Management */
+    void LoadSettings(); //INTERNAL: Load settings from external ini file
+    void SaveSettings() const; //INTERNAL: Save settings to external ini file
+
     /* Listening Status Management */
     bool StartListening(); //Start listening on saved port
     bool StartListening(quint16 iListeningPortNew); //Start listening on a given port
     void StopListening(); //Stop listening
 
+    /* Text-Based Communication */
+    void SendDataToClient(QString sDataToSend);
+
 signals:
-    void CommandReceivedEvent(QString sCommand); //Signal of a received command
+    /* Signals to Communicate with Upper Layer */
+    void ClientConnectedEvent(QString sClientIPAddress, quint16 iClientPort); //Signal of a connected client
+    void CommandReceivedEvent(QString sCommand, QString sClientIP, quint16 iClientPort); //Signal of a received command
+
+    /* Signals to Communicate with Client */
+    void SendDataToClientRequestedEvent(QString sDataToSend); //Signal of requesting sending data to client
 
 private slots:
     /* Command Incoming Event Handler Slot */
-    void SocketCommandReceivedFromClientEventHandler(QString sCommand); //Receive a command from a socket, and then post a new event to infrom upper layers
+    void SocketCommandReceivedFromClientEventHandler(QString sCommand, QString sClientIP, quint16 iClientPort); //Receive a command from a socket, and then post a new event to infrom upper layers
 
 private:
     /* Options Var */
@@ -75,10 +91,6 @@ private:
 
     /* Incoming Connection Management */
     void incomingConnection(int iSocketID); //Reimplement incomingConnecting() function, create a new socket object
-
-    /* Options Management */
-    void LoadSettings(); //INTERNAL: Load settings from external ini file
-    void SaveSettings() const; //INTERNAL: Save settings to external ini file
 };
 
 /* TCP Server */

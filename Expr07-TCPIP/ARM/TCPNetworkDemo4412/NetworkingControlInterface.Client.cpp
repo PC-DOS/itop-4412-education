@@ -143,7 +143,7 @@ void TCPClientDataSender::TCPClientDataSender_ReadyRead() {
         emit SocketResponseReceivedFromServerEvent(readLine());
 
         //Process events
-        QApplication::processEvents();
+        //QApplication::processEvents();
     }
     return;
 }
