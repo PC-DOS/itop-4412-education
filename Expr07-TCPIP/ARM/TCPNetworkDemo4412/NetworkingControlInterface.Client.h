@@ -101,7 +101,7 @@ public:
 
     /* Validators */
     bool IsValidIPAddress(const QString sIPAddress) const; //Check if the given address is valid
-    bool IsValidTCPPort(quint16 iPort, bool UseRegisteredPortsOnly=true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if RegisteredPortsOnly is true)
+    bool IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly=true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if RegisteredPortsOnly is true)
 
     /* Threads & Worker Objects */
     QThread * trdTCPDataSender; //Thread which is used to host and control worker thread
@@ -116,7 +116,7 @@ signals:
     void ConnectToServerEvent(const QString sServerIPNew, quint16 iPortNew,
                               bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
     void DisconnectFromServerEvent(bool bWairForOperationToComplete);
-    void SetAutoReconnectOptionsEvent(bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
+    void SetAutoReconnectOptionsEvent(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerEvent();
 
     /* Signals to Communicate with Upper Layer */

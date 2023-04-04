@@ -358,9 +358,9 @@ bool TCPClient::IsValidIPAddress(const QString sIPAddress) const{
     return hstTestAddr.setAddress(sIPAddress);
 }
 
-bool TCPClient::IsValidTCPPort(quint16 iPort, bool UseRegisteredPortsOnly) const{
+bool TCPClient::IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly) const{
     quint16 iPortIDMin = 1, iPortIDMax = 65535;
-    if (UseRegisteredPortsOnly){
+    if (bUseRegisteredPortsOnly){
         iPortIDMin=1024;
         iPortIDMax=32767;
     }
