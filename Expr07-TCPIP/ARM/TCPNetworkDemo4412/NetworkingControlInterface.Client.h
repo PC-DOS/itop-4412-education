@@ -101,7 +101,7 @@ public:
 
     /* Validators */
     bool IsValidIPAddress(const QString sIPAddress) const; //Check if the given address is valid
-    bool IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly = true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if RegisteredPortsOnly is true)
+    bool IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly = true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if bUseRegisteredPortsOnly is true)
 
 public slots:
     /* Worker Object Event Handler */
