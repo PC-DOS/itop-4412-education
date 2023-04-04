@@ -5,7 +5,7 @@
 TCPServer * tcpCommandServer;
 
 /* TCP Server Socket Object */
-TCPServerSocket::TCPServerSocket(){
+TCPServerSocket::TCPServerSocket() {
     //Connect events and handlers
     connect(this, SIGNAL(readyRead()), this, SLOT(CommandReceivedFromClientEventHandler()));
     connect(this, SIGNAL(connected()), this, SLOT(TCPServerSocket_Connected()));
@@ -14,13 +14,12 @@ TCPServerSocket::TCPServerSocket(){
     connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(TCPServerSocket_Error(QAbstractSocket::SocketError)));
 }
 
-TCPServerSocket::~TCPServerSocket(){
-
+TCPServerSocket::~TCPServerSocket() {
 }
 
 /* Command Incoming Event Handler Slot */
-void TCPServerSocket::CommandReceivedFromClientEventHandler(){
-    while (bytesAvailable()){
+void TCPServerSocket::CommandReceivedFromClientEventHandler() {
+    while (bytesAvailable()) {
         //Read a command line and emit a signal
         emit SocketCommandReceivedFromClientEvent(readLine());
 
@@ -31,36 +30,36 @@ void TCPServerSocket::CommandReceivedFromClientEventHandler(){
 }
 
 /* TCP Socket Event Handler Slots */
-void TCPServerSocket::TCPServerSocket_Connected(){
-    qDebug()<<"TCPServer: Connected established with remote client"<<peerAddress()<<":"<<peerPort()<<".";
+void TCPServerSocket::TCPServerSocket_Connected() {
+    qDebug() << "TCPServer: Connected established with remote client" << peerAddress() << ":" << peerPort() << ".";
     return;
 }
 
-void TCPServerSocket::TCPServerSocket_Disconnected(){
-    qDebug()<<"TCPServer: Remote client"<<peerAddress()<<"disconnected.";
+void TCPServerSocket::TCPServerSocket_Disconnected() {
+    qDebug() << "TCPServer: Remote client" << peerAddress() << "disconnected.";
     this->deleteLater(); //Delete this object safely
     return;
 }
 
-void TCPServerSocket::TCPServerSocket_Error(QAbstractSocket::SocketError errErrorInfo){
-    qDebug()<<"TCPServer: Error"<<errErrorInfo<<"occurred, connection aborted.";
+void TCPServerSocket::TCPServerSocket_Error(QAbstractSocket::SocketError errErrorInfo) {
+    qDebug() << "TCPServer: Error" << errErrorInfo << "occurred, connection aborted.";
     disconnect();
     return;
 }
 
 /* TCP Server Object */
-TCPServer::TCPServer(){
+TCPServer::TCPServer() {
     //Load settings
     TCPServer::LoadSettings();
 }
 
-TCPServer::TCPServer(quint16 iListeningPortInit){
+TCPServer::TCPServer(quint16 iListeningPortInit) {
     //Save settings
-    iListeningPort=iListeningPortInit;
+    iListeningPort = iListeningPortInit;
     TCPServer::SaveSettings();
 }
 
-TCPServer::~TCPServer(){
+TCPServer::~TCPServer() {
     //Save settings
     TCPServer::SaveSettings();
 
@@ -69,50 +68,50 @@ TCPServer::~TCPServer(){
 }
 
 /* Listening Status Management */
-bool TCPServer::StartListening(){
-    if (listen(QHostAddress::Any, iListeningPort)){
-        qDebug()<<"TCPServer: Started listening on port"<<iListeningPort;
+bool TCPServer::StartListening() {
+    if (listen(QHostAddress::Any, iListeningPort)) {
+        qDebug() << "TCPServer: Started listening on port" << iListeningPort;
         return true;
     }
-    else{
-        qDebug()<<"TCPServer: Couldnot start listening on port"<<iListeningPort;
+    else {
+        qDebug() << "TCPServer: Couldnot start listening on port" << iListeningPort;
         return false;
     }
     return false;
 }
 
-bool TCPServer::StartListening(quint16 iListeningPortNew){
+bool TCPServer::StartListening(quint16 iListeningPortNew) {
     //Save settings
-    iListeningPort=iListeningPortNew;
+    iListeningPort = iListeningPortNew;
     TCPServer::SaveSettings();
 
     //Try starting listening
-    if (listen(QHostAddress::Any, iListeningPort)){
-        qDebug()<<"TCPServer: Started listening on port"<<iListeningPort;
+    if (listen(QHostAddress::Any, iListeningPort)) {
+        qDebug() << "TCPServer: Started listening on port" << iListeningPort;
         return true;
     }
-    else{
-        qDebug()<<"TCPServer: Couldnot start listening on port"<<iListeningPort;
+    else {
+        qDebug() << "TCPServer: Couldnot start listening on port" << iListeningPort;
         return false;
     }
     return false;
 }
 
-void TCPServer::StopListening(){
-    qDebug()<<"TCPServer: Server closed";
+void TCPServer::StopListening() {
+    qDebug() << "TCPServer: Server closed";
     close(); //Close the sever and stop listening
     return;
 }
 
 /* Command Incoming Event Handler Slot */
-void TCPServer::SocketCommandReceivedFromClientEventHandler(QString sCommand){
-    qDebug()<<"TCPServer: Command"<<sCommand<<"received from the remote";
+void TCPServer::SocketCommandReceivedFromClientEventHandler(QString sCommand) {
+    qDebug() << "TCPServer: Command" << sCommand << "received from the remote";
     emit CommandReceivedEvent(sCommand);
     return;
 }
 
 /* Incoming Connection Management */
-void TCPServer::incomingConnection(int iSocketID){
+void TCPServer::incomingConnection(int iSocketID) {
     //Create a new socket object
     TCPServerSocket * tcpSocket = new TCPServerSocket;
     tcpSocket->setSocketDescriptor(iSocketID);
@@ -124,16 +123,16 @@ void TCPServer::incomingConnection(int iSocketID){
 }
 
 /* Options Management */
-void TCPServer::LoadSettings(){
+void TCPServer::LoadSettings() {
     SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
-    iListeningPort=SettingsContainer.value(ST_KEY_LISTENING_PORT,ST_DEFVAL_LISTENING_PORT).toUInt();
+    iListeningPort = SettingsContainer.value(ST_KEY_LISTENING_PORT, ST_DEFVAL_LISTENING_PORT).toUInt();
     SettingsContainer.endGroup();
     return;
 }
 
-void TCPServer::SaveSettings() const{
+void TCPServer::SaveSettings() const {
     SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
-    SettingsContainer.setValue(ST_KEY_LISTENING_PORT,iListeningPort);
+    SettingsContainer.setValue(ST_KEY_LISTENING_PORT, iListeningPort);
     SettingsContainer.endGroup();
     return;
 }

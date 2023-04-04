@@ -12,19 +12,19 @@
 #ifndef NETWORKINGCONTROLINTERFACE_SERVER_H
 #define NETWORKINGCONTROLINTERFACE_SERVER_H
 
-#include <QVector>
-#include <QQueue>
-#include <QString>
-#include <QMap>
-#include <QTcpSocket>
-#include <QTcpServer>
-#include <QThread>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QReadWriteLock>
-#include <QTimer>
 #include <QApplication>
 #include <QHostAddress>
+#include <QMap>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QQueue>
+#include <QReadWriteLock>
+#include <QString>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QThread>
+#include <QTimer>
+#include <QVector>
 
 /* TCP Server Socket Object */
 //This object maintains a connection from a local TCP server to a remote TCP client

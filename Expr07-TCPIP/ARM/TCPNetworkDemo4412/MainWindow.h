@@ -5,20 +5,19 @@
 #include <QTimer>
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0, QString sHostIP="", quint16 iHostPort=0);
+    explicit MainWindow(QWidget * parent = 0, QString sHostIP = "", quint16 iHostPort = 0);
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
-    void WriteLog(const QString & sLog, bool bIsSeparatorRequired=false);
+    Ui::MainWindow * ui;
+    void WriteLog(const QString & sLog, bool bIsSeparatorRequired = false);
 
     QTimer * tmrHeartBeat;
 

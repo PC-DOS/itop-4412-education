@@ -12,22 +12,22 @@
 #ifndef NETWORKINGCONTROLINTERFACE_CLIENT_H
 #define NETWORKINGCONTROLINTERFACE_CLIENT_H
 
-#include <QVector>
-#include <QQueue>
-#include <QString>
-#include <QMap>
-#include <QTcpSocket>
-#include <QThread>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QReadWriteLock>
-#include <QTimer>
 #include <QApplication>
 #include <QHostAddress>
+#include <QMap>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QQueue>
+#include <QReadWriteLock>
+#include <QString>
+#include <QTcpSocket>
+#include <QThread>
+#include <QTimer>
+#include <QVector>
 
 /* TCP Networking Data Sending Thread Worker Object */
 //This object is moved to a child thread to have its own event loop
-class TCPClientDataSender : public QTcpSocket{
+class TCPClientDataSender : public QTcpSocket {
     Q_OBJECT
 
 public:
@@ -68,7 +68,7 @@ private:
 };
 
 /* TCP Networking Client Wrapper */
-class TCPClient : public QObject{
+class TCPClient : public QObject {
     Q_OBJECT
 
 public:
@@ -86,7 +86,7 @@ public:
     quint16 GetServerPort() const;
     void ConnectToServer(bool bWairForOperationToComplete = false); //Connect to remote server with saved values
     void ConnectToServer(const QString sServerIPNew, quint16 iPortNew,
-                         bool bIsAutoReconnectEnabledNew=false, unsigned int iAutoReconnectDelayNew=0, bool bWairForOperationToComplete = false); //Connect to remote server with given address and port. Will update options saved in ini file
+                         bool bIsAutoReconnectEnabledNew = false, unsigned int iAutoReconnectDelayNew = 0, bool bWairForOperationToComplete = false); //Connect to remote server with given address and port. Will update options saved in ini file
     void DisconnectFromServer(bool bWairForOperationToComplete = false); //Disconnect
     void SendDataToServer();
 
@@ -101,7 +101,7 @@ public:
 
     /* Validators */
     bool IsValidIPAddress(const QString sIPAddress) const; //Check if the given address is valid
-    bool IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly=true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if RegisteredPortsOnly is true)
+    bool IsValidTCPPort(quint16 iPort, bool bUseRegisteredPortsOnly = true) const; //Check if the given port ID is valid (typically in the range of [1,65535], or [1024,32767] if RegisteredPortsOnly is true)
 
     /* Threads & Worker Objects */
     QThread * trdTCPDataSender; //Thread which is used to host and control worker thread
