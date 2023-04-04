@@ -45,17 +45,11 @@ public slots:
     void SetAutoReconnectOptionsRequestedEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerRequestedEventHandler();
 
-    /* TCP Socket Event Handler Slots */
-    void TCPClientDataSender_Connected();
-    void TCPClientDataSender_Disconnected();
-    void TCPClientDataSender_Error(QAbstractSocket::SocketError errErrorInfo);
-    void TCPClientDataSender_ReadyRead();
-
-    /* Functional Slots */
-    void TryReconnect();
-
 signals:
-    void SocketResponseReceivedFromServerEvent(QString sResponse);
+    void SocketConnectedToServerEvent(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void SocketDisconnectedFromServerEvent(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void SocketErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void SocketResponseReceivedFromServerEvent(QString sResponse, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
 
 private:
     QString sServerIP; //INTERNAL: Remote IP Address
@@ -65,6 +59,16 @@ private:
     bool bIsUserInitiatedDisconnection; //INTERNAL: Marks if user has initiated a disconnection, to avoid unexpected TryReconnect() flooding
     bool bIsReconnecting; //INTERNAL: Marks if we are alreading waiting a reconnection, to avoid unexpected TryReconnect() flooding
     bool bIsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerRequestedEventHandler() and segmentation faults
+
+private slots:
+    /* TCP Socket Event Handler Slots */
+    void TCPClientDataSender_Connected();
+    void TCPClientDataSender_Disconnected();
+    void TCPClientDataSender_Error(QAbstractSocket::SocketError errErrorInfo);
+    void TCPClientDataSender_ReadyRead();
+
+    /* Functional Slots */
+    void TryReconnect();
 };
 
 /* TCP Networking Client Wrapper */
@@ -76,6 +80,10 @@ public:
     TCPClient(const QString sServerIPNew, quint16 iPortNew,
               bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew); //Constructor with options. Will update options saved in ini file
     ~TCPClient();
+
+    /* Options Management */
+    void LoadSettings(); //Load settings from external ini file
+    void SaveSettings() const; //Save settings to external ini file
 
     /* TCP Socket Object Management */
     bool IsConnected() const; //Get if we have connected to a remote server
@@ -105,7 +113,7 @@ public:
 
 public slots:
     /* Worker Object Event Handler */
-    void SocketResponseReceivedFromServerEventHandler(QString sResponse);
+    void SocketResponseReceivedFromServerEventHandler(QString sResponse, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
 
 signals:
     /* Signals to Communicate with Worker Object */
@@ -116,15 +124,12 @@ signals:
     void SendDataToServerRequestedEvent();
 
     /* Signals to Communicate with Upper Layer */
-    void ResponseReceivedFromServerEvent(QString sResponse);
-    void ConnectedToServerEvent();
-    void DisconnectedFromServerEvent();
-    void NetworkingErrorEvent(QAbstractSocket::SocketError errErrorInfo);
+    void ResponseReceivedFromServerEvent(QString sResponse, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void ConnectedToServerEvent(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void DisconnectedFromServerEvent(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void NetworkingErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
 
 private:
-    /* Connection Management */
-    //volatile bool bIsConnected; //INTERNAL: Get if we have connected to remote server. Not used, use tcpDataSnder->tcpSocket->state() instead.
-
     /* Threads & Worker Objects */
     QThread * trdTCPDataSender; //Thread which is used to host and control worker thread
     TCPClientDataSender * tcpDataSender; //Worker object
@@ -134,10 +139,6 @@ private:
     quint16 iPort; //INTERNAL: Remote port
     bool bIsAutoReconnectEnabled; //INTERNAL: Is auto reconnect function on
     unsigned int iAutoReconnectDelay; //INTERNAL: Auto reconnect retry interval
-
-    /* Options Management */
-    void LoadSettings(); //INTERNAL: Load settings from external ini file
-    void SaveSettings() const; //INTERNAL: Save settings to external ini file
 };
 
 /* TCP Client */

@@ -10,15 +10,17 @@ MainWindow::MainWindow(QWidget * parent, QString sHostIP, quint16 iHostPort) : Q
 
     /* TCP Client Object */
     tcpDataClient = new TCPClient;
-    connect(tcpDataClient, SIGNAL(ResponseReceivedFromServerEvent(QString)), this, SLOT(ResponseReceivedEventHandler(QString)));
-    connect(tcpDataClient, SIGNAL(ConnectedToServerEvent()), this, SLOT(ConnectedToServerEventHandler()));
-    connect(tcpDataClient, SIGNAL(DisconnectedFromServerEvent()), this, SLOT(DisconnectedFromServerEventHandler()));
-    connect(tcpDataClient, SIGNAL(NetworkingErrorEvent(QAbstractSocket::SocketError)), this, SLOT(NetworkingErrorEventHandler(QAbstractSocket::SocketError)));
+    connect(tcpDataClient, SIGNAL(ResponseReceivedFromServerEvent(QString, QString, QString, quint16)), this, SLOT(ResponseReceivedEventHandler(QString, QString, QString, quint16)));
+    connect(tcpDataClient, SIGNAL(ConnectedToServerEvent(QString, QString, quint16)), this, SLOT(ConnectedToServerEventHandler(QString, QString, quint16)));
+    connect(tcpDataClient, SIGNAL(DisconnectedFromServerEvent(QString, QString, quint16)), this, SLOT(DisconnectedFromServerEventHandler(QString, QString, quint16)));
+    connect(tcpDataClient, SIGNAL(NetworkingErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)), this, SLOT(NetworkingErrorOccurredEventHandler(QAbstractSocket::SocketError, QString, QString, quint16)));
 
     /* TCP Server Object */
     tcpCommandServer = new TCPServer;
-    connect(tcpCommandServer, SIGNAL(ClientConnectedEvent(QString, quint16)), this, SLOT(ClientConnectedEventHandler(QString, quint16)));
-    connect(tcpCommandServer, SIGNAL(CommandReceivedEvent(QString, QString, quint16)), this, SLOT(DataReceivedFromClientEventHandler(QString, QString, quint16)));
+    connect(tcpCommandServer, SIGNAL(ClientConnectedEvent(QString, QString, quint16)), this, SLOT(ClientConnectedEventHandler(QString, QString, quint16)));
+    connect(tcpCommandServer, SIGNAL(ClientDisconnectedEvent(QString, QString, quint16)), this, SLOT(ClientDisconnectedEventHandler(QString, QString, quint16)));
+    connect(tcpCommandServer, SIGNAL(ClientNetworkingErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)), this, SLOT(ClientNetworkingErrorOccurredEventHandler(QAbstractSocket::SocketError, QString, QString, quint16)));
+    connect(tcpCommandServer, SIGNAL(CommandReceivedEvent(QString, QString, QString, quint16)), this, SLOT(DataReceivedFromClientEventHandler(QString, QString, QString, quint16)));
     tcpCommandServer->StartListening();
 
     /* Heart Beat Timer */
@@ -45,10 +47,10 @@ MainWindow::~MainWindow() {
     delete tmrHeartBeat;
 
     /* Delete TCP Client Object */
-    delete tcpDataClient;
+    tcpDataClient->deleteLater();
 
     /* Delete TCP Server Object */
-    delete tcpCommandServer;
+    tcpCommandServer->deleteLater();
 
     delete ui;
 }
@@ -61,38 +63,50 @@ void MainWindow::WriteLog(const QString & sLog, bool bIsSeparatorRequired) {
 }
 
 /* Networking Events Handler */
-void MainWindow::ConnectedToServerEventHandler() {
+void MainWindow::ConnectedToServerEventHandler(QString sServerName, QString sServerIPAddress, quint16 iServerPort) {
     WriteLog("System @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
-    WriteLog("Connected to server " + tcpDataClient->GetServerIP() + ":" + QString::number(tcpDataClient->GetServerPort()), true);
+    WriteLog("Connected to server \"" + sServerName + "\" (" + sServerIPAddress + ":" + QString::number(iServerPort) + ")", true);
     return;
 }
 
-void MainWindow::DisconnectedFromServerEventHandler() {
+void MainWindow::DisconnectedFromServerEventHandler(QString sServerName, QString sServerIPAddress, quint16 iServerPort) {
     WriteLog("System @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
-    WriteLog("Disconnected from server " + tcpDataClient->GetServerIP() + ":" + QString::number(tcpDataClient->GetServerPort()), true);
+    WriteLog("Disconnected from server \"" + sServerName + "\" (" + sServerIPAddress + ":" + QString::number(iServerPort) + ")", true);
     return;
 }
 
-void MainWindow::NetworkingErrorEventHandler(QAbstractSocket::SocketError errErrorInfo) {
+void MainWindow::NetworkingErrorOccurredEventHandler(QAbstractSocket::SocketError errErrorInfo, QString sServerName, QString sServerIPAddress, quint16 iServerPort) {
     WriteLog("System @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
-    WriteLog("Network error: " + QString::number(errErrorInfo), true);
+    WriteLog("Network error with server \"" + sServerName + "\" (" + sServerIPAddress + ":" + QString::number(iServerPort) + "): " + QString::number(errErrorInfo), true);
     return;
 }
 
-void MainWindow::ResponseReceivedEventHandler(QString sResponse) {
-    WriteLog("Server " + tcpDataClient->GetServerIP() + ":" + QString::number(tcpDataClient->GetServerPort()) + " @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
+void MainWindow::ResponseReceivedEventHandler(QString sResponse, QString sServerName, QString sServerIPAddress, quint16 iServerPort) {
+    WriteLog("Server \"" + sServerName + "\" (" + sServerIPAddress + ":" + QString::number(iServerPort) + ") @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
     WriteLog(sResponse, true);
     return;
 }
 
-void MainWindow::ClientConnectedEventHandler(QString sClientIPAddress, quint16 iClientPort) {
+void MainWindow::ClientConnectedEventHandler(QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
     WriteLog("System @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
-    WriteLog("Client " + sClientIPAddress + ":" + QString::number(iClientPort) + " connected", true);
+    WriteLog("Client \"" + sClientName + "\" (" + sClientIPAddress + ":" + QString::number(iClientPort) + ") connected", true);
     return;
 }
 
-void MainWindow::DataReceivedFromClientEventHandler(QString sData, QString sClientIPAddress, quint16 iClientPort) {
-    WriteLog("Client " + sClientIPAddress + ":" + QString::number(iClientPort) + " @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
+void MainWindow::ClientDisconnectedEventHandler(QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
+    WriteLog("System @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
+    WriteLog("Client \"" + sClientName + "\" (" + sClientIPAddress + ":" + QString::number(iClientPort) + ") disconnected", true);
+    return;
+}
+
+void MainWindow::ClientNetworkingErrorOccurredEventHandler(QAbstractSocket::SocketError errErrorInfo, QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
+    WriteLog("System @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
+    WriteLog("Network error with client \"" + sClientName + "\" (" + sClientIPAddress + ":" + QString::number(iClientPort) + "): " + QString::number(errErrorInfo), true);
+    return;
+}
+
+void MainWindow::DataReceivedFromClientEventHandler(QString sData, QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
+    WriteLog("Client \"" + sClientName + "\" (" + sClientIPAddress + ":" + QString::number(iClientPort) + ") @ " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ":");
     WriteLog(sData, true);
     return;
 }

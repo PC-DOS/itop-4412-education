@@ -37,10 +37,13 @@ public:
 
 public slots:
     /* Text-Based Communication */
-    void SendDataToClientRequestedEventHandler(QString sDataToSend); //Send data to client
+    void SendDataToClientRequestedEventHandler(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort); //Send data to client
 
 signals:
-    void SocketCommandReceivedFromClientEvent(QString sCommand, QString sClientIP, quint16 iClientPort); //Signal that informs the TCP Server Object a command received from the remote client
+    void SocketConnectedToServerEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
+    void SocketDisconnectedFromServerEvent(QString sClientName, QString sClinetIPAddress, quint16 iClientPort);
+    void SocketErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sClientName, QString sClientIPAddress, quint16 iClientPort);
+    void SocketCommandReceivedFromClientEvent(QString sCommand, QString sClientName, QString sClientIP, quint16 iClientPort); //Signal that informs the TCP Server Object a command received from the remote client
 
 private slots:
     /* Command Incoming Event Handler Slot */
@@ -71,19 +74,23 @@ public:
     void StopListening(); //Stop listening
 
     /* Text-Based Communication */
-    void SendDataToClient(QString sDataToSend);
+    //SendDataToClientRequestedEvent will be broadcasted to ALL connected clients
+    //If you want to specify a specific to receive data, please specify sClientName and/or sClientIP and/or iClientPort
+    void SendDataToClient(QString sDataToSend, QString sClientName="", QString sClientIP = "", quint16 iClientPort = 0);
 
 signals:
     /* Signals to Communicate with Upper Layer */
-    void ClientConnectedEvent(QString sClientIPAddress, quint16 iClientPort); //Signal of a connected client
-    void CommandReceivedEvent(QString sCommand, QString sClientIP, quint16 iClientPort); //Signal of a received command
+    void ClientConnectedEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort); //Signal of a connected client
+    void ClientDisconnectedEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort); //Signal of a disconnected client
+    void ClientNetworkingErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sClientName, QString sClientIPAddress, quint16 iClientPort); //Signal of an error
+    void CommandReceivedEvent(QString sCommand, QString sClientName, QString sClientIP, quint16 iClientPort); //Signal of a received command
 
     /* Signals to Communicate with Client */
-    void SendDataToClientRequestedEvent(QString sDataToSend); //Signal of requesting sending data to client
+    void SendDataToClientRequestedEvent(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort); //Signal of requesting sending data to client
 
 private slots:
     /* Command Incoming Event Handler Slot */
-    void SocketCommandReceivedFromClientEventHandler(QString sCommand, QString sClientIP, quint16 iClientPort); //Receive a command from a socket, and then post a new event to infrom upper layers
+    void SocketCommandReceivedFromClientEventHandler(QString sCommand, QString sClientName, QString sClientIP, quint16 iClientPort); //Receive a command from a socket, and then post a new event to infrom upper layers
 
 private:
     /* Options Var */

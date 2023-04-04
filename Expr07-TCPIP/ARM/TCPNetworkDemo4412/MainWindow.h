@@ -24,12 +24,14 @@ private:
 
 private slots:
     /* Networking Events Handler */
-    void ConnectedToServerEventHandler();
-    void DisconnectedFromServerEventHandler();
-    void NetworkingErrorEventHandler(QAbstractSocket::SocketError errErrorInfo);
-    void ResponseReceivedEventHandler(QString sResponse);
-    void ClientConnectedEventHandler(QString sClientIPAddress, quint16 iClientPort);
-    void DataReceivedFromClientEventHandler(QString sData, QString sClientIPAddress, quint16 iClientPort);
+    void ConnectedToServerEventHandler(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void DisconnectedFromServerEventHandler(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void NetworkingErrorOccurredEventHandler(QAbstractSocket::SocketError errErrorInfo, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void ResponseReceivedEventHandler(QString sResponse, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
+    void ClientConnectedEventHandler(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
+    void ClientDisconnectedEventHandler(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
+    void ClientNetworkingErrorOccurredEventHandler(QAbstractSocket::SocketError errErrorInfo, QString sClientName, QString sClientIPAddress, quint16 iClientPort);
+    void DataReceivedFromClientEventHandler(QString sData, QString sClientName, QString sClientIPAddress, quint16 iClientPort);
 
     /* Heart Beat Timer Slot */
     void tmrHeartBeat_Tick();
