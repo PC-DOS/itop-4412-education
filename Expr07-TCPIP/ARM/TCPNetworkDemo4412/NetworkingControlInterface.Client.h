@@ -114,7 +114,7 @@ public slots:
 signals:
     /* Signals to Communicate with Worker Object */
     void ConnectToServerEvent(const QString sServerIPNew, quint16 iPortNew,
-                              bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
+                              bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
     void DisconnectFromServerEvent(bool bWairForOperationToComplete);
     void SetAutoReconnectOptionsEvent(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerEvent();
