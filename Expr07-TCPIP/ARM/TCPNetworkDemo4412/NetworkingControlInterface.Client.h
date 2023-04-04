@@ -121,6 +121,9 @@ signals:
 
     /* Signals to Communicate with Upper Layer */
     void ResponseReceivedFromServerEvent(QString sResponse);
+    void ConnectedToServerEvent();
+    void DisconnectedFromServerEvent();
+    void NetworkingErrorEvent(QAbstractSocket::SocketError errErrorInfo);
 
 private:
     /* Connection Management */

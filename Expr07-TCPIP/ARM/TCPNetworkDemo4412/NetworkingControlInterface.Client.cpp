@@ -187,6 +187,9 @@ TCPClient::TCPClient(){
     connect(this, SIGNAL(SetAutoReconnectOptionsEvent(bool,uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsEventHandler(bool,uint)));
     connect(this, SIGNAL(SendDataToServerEvent()), tcpDataSender, SLOT(SendDataToServerEventHandler()));
     connect(tcpDataSender, SIGNAL(SocketResponseReceivedFromServerEvent(QString)), this, SLOT(SocketResponseReceivedFromServerEventHandler(QString)));
+    connect(tcpDataSender, SIGNAL(connected()), this, SIGNAL(ConnectedToServerEvent()));
+    connect(tcpDataSender, SIGNAL(disconnected()), this, SIGNAL(DisconnectedFromServerEvent()));
+    connect(tcpDataSender, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(NetworkingErrorEvent(QAbstractSocket::SocketError)));
 
     //Start child thread's own event loop
     trdTCPDataSender->start();
@@ -214,6 +217,9 @@ TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
     connect(this, SIGNAL(SetAutoReconnectOptionsEvent(bool,uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsEventHandler(bool,uint)));
     connect(this, SIGNAL(SendDataToServerEvent()), tcpDataSender, SLOT(SendDataToServerEventHandler()));
     connect(tcpDataSender, SIGNAL(SocketResponseReceivedFromServerEvent(QString)), this, SLOT(SocketResponseReceivedFromServerEventHandler(QString)));
+    connect(tcpDataSender, SIGNAL(connected()), this, SIGNAL(ConnectedToServerEvent()));
+    connect(tcpDataSender, SIGNAL(disconnected()), this, SIGNAL(DisconnectedFromServerEvent()));
+    connect(tcpDataSender, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(NetworkingErrorEvent(QAbstractSocket::SocketError)));
 
     //Start child thread's own event loop
     trdTCPDataSender->start();
