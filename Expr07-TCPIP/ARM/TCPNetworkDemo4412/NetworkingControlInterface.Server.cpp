@@ -63,13 +63,13 @@ void TCPServerSocket::CommandReceivedFromClientEventHandler() {
 /* TCP Socket Event Handler Slots */
 void TCPServerSocket::TCPServerSocket_Connected() {
     qDebug() << "TCPServer: Connected established with remote client" << peerAddress() << ":" << peerPort() << ".";
-    emit SocketConnectedToServerEvent(peerName(), peerAddress().toString(), peerPort());
+    emit SocketConnectedToClientEvent(peerName(), peerAddress().toString(), peerPort());
     return;
 }
 
 void TCPServerSocket::TCPServerSocket_Disconnected() {
     qDebug() << "TCPServer: Remote client" << peerAddress() << "disconnected.";
-    emit SocketDisconnectedFromServerEvent(peerName(), peerAddress().toString(), peerPort());
+    emit SocketDisconnectedFromClientEvent(peerName(), peerAddress().toString(), peerPort());
     this->deleteLater(); //Delete this object safely
     return;
 }
@@ -174,8 +174,8 @@ void TCPServer::incomingConnection(int iSocketID) {
     tcpSocket->setSocketDescriptor(iSocketID);
 
     //Connect events and handlers
-    connect(tcpSocket, SIGNAL(SocketConnectedToServerEvent(QString, QString, quint16)), this, SIGNAL(ClientConnectedEvent(QString, QString, quint16)));
-    connect(tcpSocket, SIGNAL(SocketDisconnectedFromServerEvent(QString, QString, quint16)), this, SIGNAL(ClientDisconnectedEvent(QString, QString, quint16)));
+    connect(tcpSocket, SIGNAL(SocketConnectedToClientEvent(QString, QString, quint16)), this, SIGNAL(ClientConnectedEvent(QString, QString, quint16)));
+    connect(tcpSocket, SIGNAL(SocketDisconnectedFromClientEvent(QString, QString, quint16)), this, SIGNAL(ClientDisconnectedEvent(QString, QString, quint16)));
     connect(tcpSocket, SIGNAL(SocketErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)), this, SIGNAL(ClientNetworkingErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)));
     connect(tcpSocket, SIGNAL(SocketCommandReceivedFromClientEvent(QString, QString, QString, quint16)), this, SLOT(SocketCommandReceivedFromClientEventHandler(QString, QString, QString, quint16)));
     connect(this, SIGNAL(SendDataToClientRequestedEvent(QString, QString, QString, quint16)), tcpSocket, SLOT(SendDataToClientRequestedEventHandler(QString, QString, QString, quint16)));

@@ -40,8 +40,8 @@ public slots:
     void SendDataToClientRequestedEventHandler(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort); //Send data to client
 
 signals:
-    void SocketConnectedToServerEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
-    void SocketDisconnectedFromServerEvent(QString sClientName, QString sClinetIPAddress, quint16 iClientPort);
+    void SocketConnectedToClientEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
+    void SocketDisconnectedFromClientEvent(QString sClientName, QString sClinetIPAddress, quint16 iClientPort);
     void SocketErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sClientName, QString sClientIPAddress, quint16 iClientPort);
     void SocketCommandReceivedFromClientEvent(QString sCommand, QString sClientName, QString sClientIP, quint16 iClientPort); //Signal that informs the TCP Server Object a command received from the remote client
 
