@@ -106,6 +106,8 @@ void TCPClientDataSender::SendDataToServerEventHandler(){
         //Process all events
         QApplication::processEvents();
     }
+    
+    bIsDataSending=false;
     return;
 }
 
