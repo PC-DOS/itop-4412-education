@@ -38,10 +38,10 @@ bool TCPClientDataSender::IsDataSending() const{
 
 /* Connection Management Command Handlers */
 void TCPClientDataSender::ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
-                                                      bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToCompleteNew){
+                                                      bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToCompleteNew){
     sServerIP=sServerIPNew;
     iPort=iPortNew;
-    bIsAutoReconnectEnabled=IsAutoReconnectEnabledNew;
+    bIsAutoReconnectEnabled=bIsAutoReconnectEnabledNew;
     iAutoReconnectDelay=iAutoReconnectDelayNew;
     bIsUserInitiatedDisconnection=false;
 
@@ -196,7 +196,7 @@ TCPClient::TCPClient(){
 }
 
 TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
-                     bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew){
+                     bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew){
     //Save settings
     sServerIP=sServerIPNew;
     iPort=iPortNew;

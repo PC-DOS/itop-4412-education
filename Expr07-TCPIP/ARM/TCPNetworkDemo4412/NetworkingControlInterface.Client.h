@@ -40,7 +40,7 @@ public:
 public slots:
     /* Connection Management Command Handlers */
     void ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
-                                     bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToCompleteNew);
+                                     bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToCompleteNew);
     void DisconnectFromServerEventHandler(bool bWairForOperationToComplete);
     void SetAutoReconnectOptionsEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerEventHandler();
@@ -74,7 +74,7 @@ class TCPClient : public QObject{
 public:
     TCPClient(); //Default constructor, loads options from ini file or default values
     TCPClient(const QString sServerIPNew, quint16 iPortNew,
-              bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew); //Constructor with options. Will update options saved in ini file
+              bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew); //Constructor with options. Will update options saved in ini file
     ~TCPClient();
 
     /* TCP Socket Object Management */
