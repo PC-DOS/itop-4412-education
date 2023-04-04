@@ -34,6 +34,9 @@ public:
     explicit TCPClientDataSender();
     ~TCPClientDataSender();
 
+    /* Data Sending Status Indicator */
+    bool IsDataSending() const;
+
 public slots:
     /* Connection Management Command Handlers */
     void ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
@@ -112,8 +115,8 @@ signals:
     /* Signals to Communicate with Worker Object */
     void ConnectToServerEvent(const QString sServerIPNew, quint16 iPortNew,
                               bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
-    void DisconnectFromServerEvent(bool WairForOperationToComplete);
-    void SetAutoReconnectOptionsEvent(bool IsAutoReconnectEnabled, unsigned int iAutoReconnectDelay);
+    void DisconnectFromServerEvent(bool bWairForOperationToComplete);
+    void SetAutoReconnectOptionsEvent(bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerEvent();
 
     /* Signals to Communicate with Upper Layer */
