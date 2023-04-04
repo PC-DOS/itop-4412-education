@@ -54,12 +54,12 @@ class TCPServer : public QTcpServer {
 
 public:
     TCPServer();
-    TCPServer(quint16 iListeningPort); //Construct the object with a given listening port
+    TCPServer(quint16 iListeningPortInit); //Construct the object with a given listening port
     ~TCPServer();
 
     /* Listening Status Management */
     bool StartListening(); //Start listening on saved port
-    bool StartListening(quint16 iListeningPort); //Start listening on a given port
+    bool StartListening(quint16 iListeningPortNew); //Start listening on a given port
     void StopListening(); //Stop listening
 
 signals:
@@ -71,7 +71,7 @@ private slots:
 
 private:
     /* Options Var */
-    quint16 _iListeningPort; //INTERNAL: Listening port
+    quint16 iListeningPort; //INTERNAL: Listening port
 
     /* Incoming Connection Management */
     void incomingConnection(int iSocketID); //Reimplement incomingConnecting() function, create a new socket object

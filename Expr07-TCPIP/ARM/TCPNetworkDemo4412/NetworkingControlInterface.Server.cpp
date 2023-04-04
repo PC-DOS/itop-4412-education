@@ -54,9 +54,9 @@ TCPServer::TCPServer(){
     TCPServer::LoadSettings();
 }
 
-TCPServer::TCPServer(quint16 iListeningPort){
+TCPServer::TCPServer(quint16 iListeningPortInit){
     //Save settings
-    _iListeningPort=iListeningPort;
+    iListeningPort=iListeningPortInit;
     TCPServer::SaveSettings();
 }
 
@@ -70,29 +70,29 @@ TCPServer::~TCPServer(){
 
 /* Listening Status Management */
 bool TCPServer::StartListening(){
-    if (listen(QHostAddress::Any, _iListeningPort)){
-        qDebug()<<"TCPServer: Started listening on port"<<_iListeningPort;
+    if (listen(QHostAddress::Any, iListeningPort)){
+        qDebug()<<"TCPServer: Started listening on port"<<iListeningPort;
         return true;
     }
     else{
-        qDebug()<<"TCPServer: Couldnot start listening on port"<<_iListeningPort;
+        qDebug()<<"TCPServer: Couldnot start listening on port"<<iListeningPort;
         return false;
     }
     return false;
 }
 
-bool TCPServer::StartListening(quint16 iListeningPort){
+bool TCPServer::StartListening(quint16 iListeningPortNew){
     //Save settings
-    _iListeningPort=iListeningPort;
+    iListeningPort=iListeningPortNew;
     TCPServer::SaveSettings();
 
     //Try starting listening
-    if (listen(QHostAddress::Any, _iListeningPort)){
-        qDebug()<<"TCPServer: Started listening on port"<<_iListeningPort;
+    if (listen(QHostAddress::Any, iListeningPort)){
+        qDebug()<<"TCPServer: Started listening on port"<<iListeningPort;
         return true;
     }
     else{
-        qDebug()<<"TCPServer: Couldnot start listening on port"<<_iListeningPort;
+        qDebug()<<"TCPServer: Couldnot start listening on port"<<iListeningPort;
         return false;
     }
     return false;
@@ -126,14 +126,14 @@ void TCPServer::incomingConnection(int iSocketID){
 /* Options Management */
 void TCPServer::LoadSettings(){
     SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
-    _iListeningPort=SettingsContainer.value(ST_KEY_LISTENING_PORT,ST_DEFVAL_LISTENING_PORT).toUInt();
+    iListeningPort=SettingsContainer.value(ST_KEY_LISTENING_PORT,ST_DEFVAL_LISTENING_PORT).toUInt();
     SettingsContainer.endGroup();
     return;
 }
 
 void TCPServer::SaveSettings() const{
     SettingsContainer.beginGroup(ST_KEY_NETWORKING_PREFIX);
-    SettingsContainer.setValue(ST_KEY_LISTENING_PORT,_iListeningPort);
+    SettingsContainer.setValue(ST_KEY_LISTENING_PORT,iListeningPort);
     SettingsContainer.endGroup();
     return;
 }

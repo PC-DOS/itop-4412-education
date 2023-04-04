@@ -13,7 +13,7 @@
 
 /* Main Strings */
 #define ST_MAIN_ORGANIZATION "SEU-BME"
-#define ST_MAIN_APPLICATION "TCPNetworkDemo4412"
+#define ST_MAIN_APPLICATION "TCPNetworkDemo4418"
 #define ST_MAIN_DATABASE_PATH "./Network.ini"
 
 /* Setting Key Names */

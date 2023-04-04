@@ -36,9 +36,10 @@ public:
 
 public slots:
     /* Connection Management Command Handlers */
-    void ConnectToServerEventHandler(const QString sServerIP, quint16 iPort, bool IsAutoReconnectEnabled, unsigned int iAutoReconnectDelay, bool WairForOperationToComplete);
-    void DisconnectFromServerEventHandler(bool WairForOperationToComplete);
-    void SetAutoReconnectOptionsEventHandler(bool IsAutoReconnectEnabled, unsigned int iAutoReconnectDelay);
+    void ConnectToServerEventHandler(const QString sServerIPNew, quint16 iPortNew,
+                                     bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToCompleteNew);
+    void DisconnectFromServerEventHandler(bool bWairForOperationToComplete);
+    void SetAutoReconnectOptionsEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerEventHandler();
 
     /* TCP Socket Event Handler Slots */
@@ -54,13 +55,13 @@ signals:
     void SocketResponseReceivedFromServerEvent(QString sResponse);
 
 private:
-    QString _sServerIP; //INTERNAL: Remote IP Address
-    quint16 _iPort; //INTERNAL: Remote port
-    bool _IsAutoReconnectEnabled; //INTERNAL: Is auto reconnect function on
-    unsigned int _iAutoReconnectDelay; //INTERNAL: Auto reconnect retry interval
-    bool _IsUserInitiatedDisconnection; //INTERNAL: Marks if user has initiated a disconnection, to avoid unexpected TryReconnect() flooding
-    bool _IsReconnecting; //INTERNAL: Marks if we are alreading waiting a reconnection, to avoid unexpected TryReconnect() flooding
-    bool _IsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerEventHandler() and segmentation faults
+    QString sServerIP; //INTERNAL: Remote IP Address
+    quint16 iPort; //INTERNAL: Remote port
+    bool bIsAutoReconnectEnabled; //INTERNAL: Is auto reconnect function on
+    unsigned int iAutoReconnectDelay; //INTERNAL: Auto reconnect retry interval
+    bool bIsUserInitiatedDisconnection; //INTERNAL: Marks if user has initiated a disconnection, to avoid unexpected TryReconnect() flooding
+    bool bIsReconnecting; //INTERNAL: Marks if we are alreading waiting a reconnection, to avoid unexpected TryReconnect() flooding
+    bool bIsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerEventHandler() and segmentation faults
 };
 
 /* TCP Networking Client Wrapper */
@@ -69,28 +70,30 @@ class TCPClient : public QObject{
 
 public:
     TCPClient(); //Default constructor, loads options from ini file or default values
-    TCPClient(const QString sServerIP, quint16 iPort, bool IsAutoReconnectEnabled, unsigned int iAutoReconnectDelay); //Constructor with options. Will update options saved in ini file
+    TCPClient(const QString sServerIPNew, quint16 iPortNew,
+              bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew); //Constructor with options. Will update options saved in ini file
     ~TCPClient();
 
     /* TCP Socket Object Management */
     bool IsConnected() const; //Get if we have connected to a remote server
 
     /* Connection Management */
-    void SetServerParameters(const QString sServerIP, quint16 iPort); //Host information (IP & Port)
+    void SetServerParameters(const QString sServerIPNew, quint16 iPortNew); //Host information (IP & Port)
     const QString & GetServerIP() const;
     quint16 GetServerPort() const;
-    void ConnectToServer(bool WairForOperationToComplete = false); //Connect to remote server with saved values
-    void ConnectToServer(const QString sServerIP, quint16 iPort, bool IsAutoReconnectEnabled=false, unsigned int iAutoReconnectDelay=0, bool WairForOperationToComplete = false); //Connect to remote server with given address and port. Will update options saved in ini file
-    void DisconnectFromServer(bool WairForOperationToComplete = false); //Disconnect
+    void ConnectToServer(bool bWairForOperationToComplete = false); //Connect to remote server with saved values
+    void ConnectToServer(const QString sServerIPNew, quint16 iPortNew,
+                         bool bIsAutoReconnectEnabledNew=false, unsigned int iAutoReconnectDelayNew=0, bool bWairForOperationToComplete = false); //Connect to remote server with given address and port. Will update options saved in ini file
+    void DisconnectFromServer(bool bWairForOperationToComplete = false); //Disconnect
     void SendDataToServer();
 
     /* Data Frame Queue Management */
     void QueueDataFrame(const QString & sData); //Queue a data frame
 
     /* Options */
-    void SetAutoReconnectMode(bool IsAutoReconnectEnabled); //Set & Get auto reconnect function (handles error events)
+    void SetAutoReconnectMode(bool bIsAutoReconnectEnabledNew); //Set & Get auto reconnect function (handles error events)
     bool GetIsAutoReconnectEnabled() const;
-    void SetAutoReconnectDelay(unsigned int iAutoReconnectDelay); //Set & Get auto reconnect retry interval
+    void SetAutoReconnectDelay(unsigned int iAutoReconnectDelayNew); //Set & Get auto reconnect retry interval
     unsigned int GetAutoReconnectDelay() const;
 
     /* Validators */
@@ -107,7 +110,8 @@ public slots:
 
 signals:
     /* Signals to Communicate with Worker Object */
-    void ConnectToServerEvent(const QString sServerIP, quint16 iPort, bool IsAutoReconnectEnabled, unsigned int iAutoReconnectDelay, bool WairForOperationToComplete);
+    void ConnectToServerEvent(const QString sServerIPNew, quint16 iPortNew,
+                              bool IsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew, bool bWairForOperationToComplete);
     void DisconnectFromServerEvent(bool WairForOperationToComplete);
     void SetAutoReconnectOptionsEvent(bool IsAutoReconnectEnabled, unsigned int iAutoReconnectDelay);
     void SendDataToServerEvent();
@@ -120,10 +124,10 @@ private:
     //volatile bool _IsConnected; //INTERNAL: Get if we have connected to remote server. Not used, use tcpDataSnder->tcpSocket->state() instead.
 
     /* Options Var */
-    QString _sServerIP; //INTERNAL: Remote IP Address
-    quint16 _iPort; //INTERNAL: Remote port
-    bool _IsAutoReconnectEnabled; //INTERNAL: Is auto reconnect function on
-    unsigned int _iAutoReconnectDelay; //INTERNAL: Auto reconnect retry interval
+    QString sServerIP; //INTERNAL: Remote IP Address
+    quint16 iPort; //INTERNAL: Remote port
+    bool bIsAutoReconnectEnabled; //INTERNAL: Is auto reconnect function on
+    unsigned int iAutoReconnectDelay; //INTERNAL: Auto reconnect retry interval
 
     /* Options Management */
     void LoadSettings(); //INTERNAL: Load settings from external ini file

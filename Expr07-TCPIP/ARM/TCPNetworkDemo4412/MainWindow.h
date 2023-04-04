@@ -18,7 +18,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    void WriteLog(const QString & sLog, bool IsSeparatorRequired=false);
+    void WriteLog(const QString & sLog, bool bIsSeparatorRequired=false);
 
     QTimer * tmrHeartBeat;
 

@@ -38,9 +38,9 @@ MainWindow::~MainWindow(){
     delete ui;
 }
 
-void MainWindow::WriteLog(const QString &sLog, bool IsSeparatorRequired){
+void MainWindow::WriteLog(const QString & sLog, bool bIsSeparatorRequired){
     ui->txtHistory->appendPlainText(sLog);
-    if (IsSeparatorRequired){
+    if (bIsSeparatorRequired){
         ui->txtHistory->appendPlainText("");
     }
 }
