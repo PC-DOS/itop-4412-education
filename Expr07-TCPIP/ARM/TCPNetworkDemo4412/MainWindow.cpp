@@ -47,10 +47,10 @@ MainWindow::~MainWindow() {
     delete tmrHeartBeat;
 
     /* Delete TCP Client Object */
-    tcpDataClient->deleteLater();
+    delete tcpDataClient;
 
     /* Delete TCP Server Object */
-    tcpCommandServer->deleteLater();
+    delete tcpCommandServer;
 
     delete ui;
 }

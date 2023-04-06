@@ -48,6 +48,12 @@ void TCPServerSocket::SendDataToClientRequestedEventHandler(QString sDataToSend,
     return;
 }
 
+/* Connection Management */
+void TCPServerSocket::ClosingAllConnectionsRequestedEventHandler() {
+    abort();
+    return;
+}
+
 /* Command Incoming Event Handler Slot */
 void TCPServerSocket::CommandReceivedFromClientEventHandler() {
     while (bytesAvailable()) {
@@ -101,6 +107,9 @@ TCPServer::~TCPServer() {
     if (isListening()) {
         TCPServer::StopListening();
     }
+
+    //Abort all connected clients
+    emit ClosingAllConnectionsRequestedEvent();
 }
 
 /* Options Management */
@@ -179,6 +188,10 @@ void TCPServer::incomingConnection(int iSocketID) {
     connect(tcpSocket, SIGNAL(SocketErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)), this, SIGNAL(ClientNetworkingErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)));
     connect(tcpSocket, SIGNAL(SocketCommandReceivedFromClientEvent(QString, QString, QString, quint16)), this, SLOT(SocketCommandReceivedFromClientEventHandler(QString, QString, QString, quint16)));
     connect(this, SIGNAL(SendDataToClientRequestedEvent(QString, QString, QString, quint16)), tcpSocket, SLOT(SendDataToClientRequestedEventHandler(QString, QString, QString, quint16)));
+    connect(this, SIGNAL(ClosingAllConnectionsRequestedEvent()), tcpSocket, SLOT(ClosingAllConnectionsRequestedEventHandler()));
+
+    //Inform upper layer(s) of a newly connected client
+    emit ClientConnectedEvent(tcpSocket->peerName(), tcpSocket->peerAddress().toString(), tcpSocket->peerPort());
 
     return;
 }
