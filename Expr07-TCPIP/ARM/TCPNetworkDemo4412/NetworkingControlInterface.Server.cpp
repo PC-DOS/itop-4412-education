@@ -62,7 +62,7 @@ void TCPServerSocket::CommandReceivedFromClientEventHandler() {
 
 /* TCP Socket Event Handler Slots */
 void TCPServerSocket::TCPServerSocket_Connected() {
-    qDebug() << "TCPServer: Connected established with remote client" << peerAddress() << ":" << peerPort() << ".";
+    qDebug() << "TCPServer: Connection established with remote client" << peerAddress() << ":" << peerPort() << ".";
     emit SocketConnectedToClientEvent(peerName(), peerAddress().toString(), peerPort());
     return;
 }
