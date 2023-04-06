@@ -40,7 +40,7 @@ public slots:
     void SendDataToClientRequestedEventHandler(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort); //Send data to client
 
     /* Connection Management */
-    void ClosingAllConnectionsRequestedEventHandler();
+    void CloseAllConnectionsRequestedEventHandler();
 
 signals:
     void SocketConnectedToClientEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
@@ -90,7 +90,7 @@ signals:
 
     /* Signals to Communicate with Client */
     void SendDataToClientRequestedEvent(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort); //Signal of requesting sending data to client
-    void ClosingAllConnectionsRequestedEvent(); //Signal of closing all connected clients' connections, emitted when server is closed
+    void CloseAllConnectionsRequestedEvent(); //Signal of closing all connected clients' connections, emitted when server is closed
 
 private slots:
     /* Command Incoming Event Handler Slot */
