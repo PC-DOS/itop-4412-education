@@ -181,6 +181,7 @@ void TCPServer::incomingConnection(int iSocketID) {
     //Create a new socket object
     TCPServerSocket * tcpSocket = new TCPServerSocket;
     tcpSocket->setSocketDescriptor(iSocketID);
+    tcpSocket->setSocketOption(QAbstractSocket::LowDelayOption, 1); //Set for low delay, avoid packet sticking
 
     //Connect events and handlers
     connect(tcpSocket, SIGNAL(SocketConnectedToClientEvent(QString, QString, quint16)), this, SIGNAL(ClientConnectedEvent(QString, QString, quint16)));
