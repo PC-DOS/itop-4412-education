@@ -18,7 +18,7 @@ TCPServerSocket::~TCPServerSocket() {
 }
 
 /* Text-Based Communication */
-void TCPServerSocket::SendDataToClientRequestedEventHandler(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort) {
+void TCPServerSocket::SendDataToClientRequestedEventHandler(QString sDataToSend, QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
     /*
     //Add line separator, using Windows mode ("\r\n")
     if (!sDataToSend.endsWith("\r\n")){
@@ -34,14 +34,14 @@ void TCPServerSocket::SendDataToClientRequestedEventHandler(QString sDataToSend,
     }
     */
     //Judge if we need to handle the request
-    if ((sClientName == "" && sClientIP == "" && iClientPort == 0) ||
-        (sClientName == peerName() && sClientIP == "" && iClientPort == 0) ||
-        (sClientName == "" && sClientIP == peerAddress().toString() && iClientPort == 0) ||
-        (sClientName == "" && sClientIP == "" && iClientPort == peerPort()) ||
-        (sClientName == peerName() && sClientIP == peerAddress().toString() && iClientPort == 0) ||
-        (sClientName == peerName() && sClientIP == "" && iClientPort == peerPort()) ||
-        (sClientName == "" && sClientIP == peerAddress().toString() && iClientPort == peerPort()) ||
-        (sClientName == peerName() && sClientIP == peerAddress().toString() && iClientPort == peerPort()) ) {
+    if ((sClientName == "" && sClientIPAddress == "" && iClientPort == 0) ||
+        (sClientName == peerName() && sClientIPAddress == "" && iClientPort == 0) ||
+        (sClientName == "" && sClientIPAddress == peerAddress().toString() && iClientPort == 0) ||
+        (sClientName == "" && sClientIPAddress == "" && iClientPort == peerPort()) ||
+        (sClientName == peerName() && sClientIPAddress == peerAddress().toString() && iClientPort == 0) ||
+        (sClientName == peerName() && sClientIPAddress == "" && iClientPort == peerPort()) ||
+        (sClientName == "" && sClientIPAddress == peerAddress().toString() && iClientPort == peerPort()) ||
+        (sClientName == peerName() && sClientIPAddress == peerAddress().toString() && iClientPort == peerPort()) ) {
         //Send text to remote, using UTF-8
         write(sDataToSend.toUtf8());
     }
@@ -170,9 +170,9 @@ void TCPServer::SendDataToClient(QString sDataToSend, QString sClientName, QStri
 }
 
 /* Command Incoming Event Handler Slot */
-void TCPServer::SocketCommandReceivedFromClientEventHandler(QString sCommand, QString sClientName, QString sClientIP, quint16 iClientPort) {
+void TCPServer::SocketCommandReceivedFromClientEventHandler(QString sCommand, QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
     qDebug() << "TCPServer: Command" << sCommand << "received from the remote";
-    emit CommandReceivedEvent(sCommand, sClientName, sClientIP, iClientPort);
+    emit CommandReceivedEvent(sCommand, sClientName, sClientIPAddress, iClientPort);
     return;
 }
 
