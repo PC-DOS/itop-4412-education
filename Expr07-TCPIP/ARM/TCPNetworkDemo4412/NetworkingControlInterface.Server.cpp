@@ -66,7 +66,14 @@ void TCPServerSocket::CloseAllConnectionsRequestedEventHandler() {
 void TCPServerSocket::CommandReceivedFromClientEventHandler() {
     while (bytesAvailable()) {
         //Read a command line and emit a signal
-        emit SocketCommandReceivedFromClientEvent(readLine(), peerName(), peerAddress().toString(), peerPort());
+        QString sData = readLine();
+        if (sData.endsWith('\n')) {
+            sData.remove(sData.length() - 1, 1);
+        }
+        if (sData.endsWith('\r')) {
+            sData.remove(sData.length() - 1, 1);
+        }
+        emit SocketCommandReceivedFromClientEvent(sData, peerName(), peerAddress().toString(), peerPort());
 
         //Process events
         //QApplication::processEvents();
