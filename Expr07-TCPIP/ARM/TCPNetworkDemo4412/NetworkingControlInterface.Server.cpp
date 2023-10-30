@@ -33,6 +33,14 @@ void TCPServerSocket::SendDataToClientRequestedEventHandler(QString sDataToSend,
         }
     }
     */
+    //Add line separator, using Linux mode ("\n")
+    if (!sDataToSend.endsWith("\n")){
+        sDataToSend+='\n';
+    }
+    else if (sDataToSend.endsWith("\r\n")) {
+        sDataToSend.remove(sDataToSend.length()-2, 1);
+    }
+    
     //Judge if we need to handle the request
     if ((sClientName == "" && sClientIPAddress == "" && iClientPort == 0) ||
         (sClientName == peerName() && sClientIPAddress == "" && iClientPort == 0) ||
