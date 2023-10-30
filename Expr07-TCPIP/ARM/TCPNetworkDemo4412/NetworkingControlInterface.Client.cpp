@@ -143,7 +143,14 @@ void TCPClientDataSender::TCPClientDataSender_Error(QAbstractSocket::SocketError
 void TCPClientDataSender::TCPClientDataSender_ReadyRead() {
     while (bytesAvailable()) {
         //Read a command line and emit a signal
-        emit SocketResponseReceivedFromServerEvent(readLine(), peerName(), sServerIP, iPort);
+        QString sData = readLine();
+        if (sData.endsWith('\n')) {
+            sData.remove(sData.length() - 1, 1);
+        }
+        if (sData.endsWith('\r')) {
+            sData.remove(sData.length() - 1, 1);
+        }
+        emit SocketResponseReceivedFromServerEvent(sData, peerName(), sServerIP, iPort);
 
         //Process events
         //QApplication::processEvents();
