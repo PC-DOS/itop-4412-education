@@ -46,6 +46,7 @@ public slots:
     void SendDataToServerRequestedEventHandler();
 
 signals:
+    /* Signals to Communicate with Controller */
     void SocketConnectedToServerEvent(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
     void SocketDisconnectedFromServerEvent(QString sServerName, QString sServerIPAddress, quint16 iServerPort);
     void SocketErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sServerName, QString sServerIPAddress, quint16 iServerPort);

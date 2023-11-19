@@ -43,6 +43,7 @@ public slots:
     void CloseAllConnectionsRequestedEventHandler();
 
 signals:
+    /* Signals to Communicate with Upper Layer */
     void SocketConnectedToClientEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
     void SocketDisconnectedFromClientEvent(QString sClientName, QString sClientIPAddress, quint16 iClientPort);
     void SocketErrorOccurredEvent(QAbstractSocket::SocketError errErrorInfo, QString sClientName, QString sClientIPAddress, quint16 iClientPort);
