@@ -81,7 +81,9 @@ void TCPClientDataSender::SendDataToServerRequestedEventHandler() {
         bIsDataSending = true;
     }
 
-    while (!queDataFramesPendingSending.empty() && state() == QTcpSocket::ConnectedState) { //Sends all queued data frames to remote
+    //Send all queued data frames to remote
+    //Data sending load may be very high, thus we use a while(){} loop
+    while (!queDataFramesPendingSending.empty() && state() == QTcpSocket::ConnectedState) {
         QString * frmCurrentSendingDataFrame = NULL;
 
         if (mtxDataFramesPendingSendingLock.tryLock()) { //Begin reading internal buffer
