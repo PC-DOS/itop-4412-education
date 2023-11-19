@@ -382,14 +382,14 @@ void TCPClient::PurgeDataFrameQueue() {
         //QApplication::processEvents();
     }
 
-    rwlDataFramesPendingSendingLock.lockInline(); //Begin writing internal buffer
+    mtxDataFramesPendingSendingLock.lockInline(); //Begin writing internal buffer
 
     while (!queDataFramesPendingSending.empty()){
         delete queDataFramesPendingSending.dequeue();
     }
     qDebug()<<"TCPClient: Data queue has been purged by user.";
 
-    rwlDataFramesPendingSendingLock.unlockInline(); //Don't forget to unlock me!
+    mtxDataFramesPendingSendingLock.unlockInline(); //Don't forget to unlock me!
     return;
 }
 
