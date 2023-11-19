@@ -260,7 +260,10 @@ TCPClient::~TCPClient() {
     //Quit child thread
     trdTCPDataSender->quit();
     if (!trdTCPDataSender->wait(1000)) {
-        trdTCPDataSender->terminate();
+        emit StopDataSendingRequestedEvent();
+        if (!trdTCPDataSenderThread->wait(100)) {
+            trdTCPDataSenderThread->terminate();
+        }
     }
 
     //Delete worker object
