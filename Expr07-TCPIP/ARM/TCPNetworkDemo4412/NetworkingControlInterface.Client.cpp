@@ -17,6 +17,7 @@ TCPClient * tcpDataClient;
 TCPClientDataSender::TCPClientDataSender() {
     //Initialize internal variables
     bIsDataSending = false;
+    bIsDataSendingStopRequested = false;
     bIsUserInitiatedDisconnection = false;
     bIsReconnecting = false;
 
@@ -105,9 +106,19 @@ void TCPClientDataSender::SendDataToServerRequestedEventHandler() {
 
         //Process all events
         QApplication::processEvents();
+
+        //Check if we need to stop data sending
+        if (bIsDataSendingStopRequested) {
+            break;
+        }
     }
 
     bIsDataSending = false;
+    return;
+}
+
+void TCPClientDataSender::StopDataSendingRequestedEventHandler() {
+    bIsDataSendingStopRequested = true;
     return;
 }
 
@@ -196,6 +207,7 @@ TCPClient::TCPClient() {
     connect(this, SIGNAL(DisconnectFromServerRequestedEvent(bool)), tcpDataSender, SLOT(DisconnectFromServerRequestedEventHandler(bool)));
     connect(this, SIGNAL(SetAutoReconnectOptionsRequestedEvent(bool, uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsRequestedEventHandler(bool, uint)));
     connect(this, SIGNAL(SendDataToServerRequestedEvent()), tcpDataSender, SLOT(SendDataToServerRequestedEventHandler()));
+    connect(this, SIGNAL(StopDataSendingRequestedEvent()), tcpDataSender, SLOT(StopDataSendingRequestedEventHandler()));
     connect(tcpDataSender, SIGNAL(SocketResponseReceivedFromServerEvent(QString, QString, QString, quint16)), this, SLOT(SocketResponseReceivedFromServerEventHandler(QString, QString, QString, quint16)));
     connect(tcpDataSender, SIGNAL(SocketConnectedToServerEvent(QString, QString, quint16)), this, SIGNAL(ConnectedToServerEvent(QString, QString, quint16)));
     connect(tcpDataSender, SIGNAL(SocketDisconnectedFromServerEvent(QString, QString, quint16)), this, SIGNAL(DisconnectedFromServerEvent(QString, QString, quint16)));
@@ -226,6 +238,7 @@ TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
     connect(this, SIGNAL(DisconnectFromServerRequestedEvent(bool)), tcpDataSender, SLOT(DisconnectFromServerRequestedEventHandler(bool)));
     connect(this, SIGNAL(SetAutoReconnectOptionsRequestedEvent(bool, uint)), tcpDataSender, SLOT(SetAutoReconnectOptionsRequestedEventHandler(bool, uint)));
     connect(this, SIGNAL(SendDataToServerRequestedEvent()), tcpDataSender, SLOT(SendDataToServerRequestedEventHandler()));
+    connect(this, SIGNAL(StopDataSendingRequestedEvent()), tcpDataSender, SLOT(StopDataSendingRequestedEventHandler()));
     connect(tcpDataSender, SIGNAL(SocketResponseReceivedFromServerEvent(QString, QString, QString, quint16)), this, SLOT(SocketResponseReceivedFromServerEventHandler(QString, QString, QString, quint16)));
     connect(tcpDataSender, SIGNAL(SocketConnectedToServerEvent(QString, QString, quint16)), this, SIGNAL(ConnectedToServerEvent(QString, QString, quint16)));
     connect(tcpDataSender, SIGNAL(SocketDisconnectedFromServerEvent(QString, QString, quint16)), this, SIGNAL(DisconnectedFromServerEvent(QString, QString, quint16)));
@@ -336,6 +349,11 @@ void TCPClient::SendDataToServer() {
     return;
 }
 
+void TCPClient::StopDataSending() {
+    emit StopDataSendingRequestedEvent();
+    return;
+}
+
 /* Data Frame Queue Management */
 void TCPClient::QueueDataFrame(const QString & sData) {
     mtxDataFramesPendingSendingLock.lock(); //Begin writing internal buffer
@@ -351,6 +369,25 @@ void TCPClient::QueueDataFrame(const QString & sData) {
 
     mtxDataFramesPendingSendingLock.unlock(); //Don't forget to unlock me!
 
+    return;
+}
+
+void TCPClient::PurgeDataFrameQueue() {
+    //Wait until all current sending operation is finished
+    emit StopDataSendingRequestedEvent();
+    while (tcpDataSender->IsDataSending()) {
+        ;
+        //QApplication::processEvents();
+    }
+
+    rwlDataFramesPendingSendingLock.lockInline(); //Begin writing internal buffer
+
+    while (!queDataFramesPendingSending.empty()){
+        delete queDataFramesPendingSending.dequeue();
+    }
+    qDebug()<<"TCPClient: Data queue has been purged by user.";
+
+    rwlDataFramesPendingSendingLock.unlockInline(); //Don't forget to unlock me!
     return;
 }
 

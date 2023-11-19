@@ -44,6 +44,7 @@ public slots:
     void DisconnectFromServerRequestedEventHandler(bool bWairForOperationToComplete);
     void SetAutoReconnectOptionsRequestedEventHandler(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerRequestedEventHandler();
+    void StopDataSendingRequestedEventHandler();
 
 signals:
     /* Signals to Communicate with Controller */
@@ -60,6 +61,7 @@ private:
     bool bIsUserInitiatedDisconnection; //INTERNAL: Marks if user has initiated a disconnection, to avoid unexpected TryReconnect() flooding
     bool bIsReconnecting; //INTERNAL: Marks if we are alreading waiting a reconnection, to avoid unexpected TryReconnect() flooding
     volatile bool bIsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerRequestedEventHandler() and segmentation faults
+    volatile bool bIsDataSendingStopRequested; //INTERNAL: Marks if controller has requested to stop data sending
 
 private slots:
     /* TCP Socket Event Handler Slots */
@@ -98,6 +100,8 @@ public:
                          bool bIsAutoReconnectEnabledNew = false, unsigned int iAutoReconnectDelayNew = 0, bool bWairForOperationToComplete = false); //Connect to remote server with given address and port. Will update options saved in ini file
     void DisconnectFromServer(bool bWairForOperationToComplete = false); //Disconnect
     void SendDataToServer();
+    void StopDataSending();
+    void PurgeDataFrameQueue(); //Force to purge DataFrameQueue
 
     /* Data Frame Queue Management */
     void QueueDataFrame(const QString & sData); //Queue a data frame
@@ -123,6 +127,7 @@ signals:
     void DisconnectFromServerRequestedEvent(bool bWairForOperationToComplete);
     void SetAutoReconnectOptionsRequestedEvent(bool bIsAutoReconnectEnabledNew, unsigned int iAutoReconnectDelayNew);
     void SendDataToServerRequestedEvent();
+    void StopDataSendingRequestedEvent();
 
     /* Signals to Communicate with Upper Layer */
     void ResponseReceivedFromServerEvent(QString sResponse, QString sServerName, QString sServerIPAddress, quint16 iServerPort);
