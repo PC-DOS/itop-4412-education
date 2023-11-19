@@ -180,8 +180,8 @@ void TCPServer::StopListening() {
 }
 
 /* Text-Based Communication */
-void TCPServer::SendDataToClient(QString sDataToSend, QString sClientName, QString sClientIP, quint16 iClientPort) {
-    emit SendDataToClientRequestedEvent(sDataToSend, sClientName, sClientIP, iClientPort);
+void TCPServer::SendDataToClient(QString sDataToSend, QString sClientName, QString sClientIPAddress, quint16 iClientPort) {
+    emit SendDataToClientRequestedEvent(sDataToSend, sClientName, sClientIPAddress, iClientPort);
 }
 
 /* Command Incoming Event Handler Slot */

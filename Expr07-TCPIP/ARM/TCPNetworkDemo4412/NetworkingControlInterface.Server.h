@@ -79,8 +79,8 @@ public:
 
     /* Text-Based Communication */
     //SendDataToClientRequestedEvent will be broadcasted to ALL connected clients
-    //If you want to specify a specific to receive data, please specify sClientName and/or sClientIP and/or iClientPort
-    void SendDataToClient(QString sDataToSend, QString sClientName="", QString sClientIP = "", quint16 iClientPort = 0);
+    //If you want to specify a specific to receive data, please specify sClientName and/or sClientIPAddress and/or iClientPort
+    void SendDataToClient(QString sDataToSend, QString sClientName="", QString sClientIPAddress = "", quint16 iClientPort = 0);
 
 signals:
     /* Signals to Communicate with Upper Layer */
