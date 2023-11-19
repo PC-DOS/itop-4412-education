@@ -100,7 +100,7 @@ void TCPClientDataSender::SendDataToServerRequestedEventHandler() {
 
         //Send data
         write(frmCurrentSendingDataFrame->toLatin1()); //Convert QString to ASCII sequence
-        flush();
+        //flush();
 
         //Free memory space
         delete frmCurrentSendingDataFrame;
