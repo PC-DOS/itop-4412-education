@@ -137,7 +137,7 @@ signals:
 
 private:
     /* Threads & Worker Objects */
-    QThread * trdTCPDataSender; //Thread which is used to host and control worker thread
+    QThread * trdTCPDataSenderThread; //Thread which is used to host and control worker thread
     TCPClientDataSender * tcpDataSender; //Worker object
 
     /* Options Var */

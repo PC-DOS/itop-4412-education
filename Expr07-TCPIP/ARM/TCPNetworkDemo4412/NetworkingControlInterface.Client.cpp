@@ -201,8 +201,8 @@ TCPClient::TCPClient() {
     tcpDataSender = new TCPClientDataSender;
 
     //Creat thread object and move worker object (and all it's child objects) to this thread
-    trdTCPDataSender = new QThread;
-    tcpDataSender->moveToThread(trdTCPDataSender);
+    trdTCPDataSenderThread = new QThread;
+    tcpDataSender->moveToThread(trdTCPDataSenderThread);
 
     //Connect events and handlers
     connect(this, SIGNAL(ConnectToServerRequestedEvent(QString, quint16, bool, unsigned int, bool)), tcpDataSender, SLOT(ConnectToServerRequestedEventHandler(QString, quint16, bool, unsigned int, bool)));
@@ -216,7 +216,7 @@ TCPClient::TCPClient() {
     connect(tcpDataSender, SIGNAL(SocketErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)), this, SIGNAL(NetworkingErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)));
 
     //Start child thread's own event loop
-    trdTCPDataSender->start();
+    trdTCPDataSenderThread->start();
 }
 
 TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
@@ -232,8 +232,8 @@ TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
     tcpDataSender = new TCPClientDataSender;
 
     //Creat thread object
-    trdTCPDataSender = new QThread;
-    tcpDataSender->moveToThread(trdTCPDataSender);
+    trdTCPDataSenderThread = new QThread;
+    tcpDataSender->moveToThread(trdTCPDataSenderThread);
 
     //Connect events and handlers
     connect(this, SIGNAL(ConnectToServerRequestedEvent(QString, quint16, bool, unsigned int, bool)), tcpDataSender, SLOT(ConnectToServerRequestedEventHandler(QString, quint16, bool, unsigned int, bool)));
@@ -247,7 +247,7 @@ TCPClient::TCPClient(const QString sServerIPNew, quint16 iPortNew,
     connect(tcpDataSender, SIGNAL(SocketErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)), this, SIGNAL(NetworkingErrorOccurredEvent(QAbstractSocket::SocketError, QString, QString, quint16)));
 
     //Start child thread's own event loop
-    trdTCPDataSender->start();
+    trdTCPDataSenderThread->start();
 }
 
 TCPClient::~TCPClient() {
@@ -258,8 +258,8 @@ TCPClient::~TCPClient() {
     TCPClient::SaveSettings();
 
     //Quit child thread
-    trdTCPDataSender->quit();
-    if (!trdTCPDataSender->wait(1000)) {
+    trdTCPDataSenderThread->quit();
+    if (!trdTCPDataSenderThread->wait(1000)) {
         emit StopDataSendingRequestedEvent();
         if (!trdTCPDataSenderThread->wait(100)) {
             trdTCPDataSenderThread->terminate();
@@ -271,8 +271,8 @@ TCPClient::~TCPClient() {
     tcpDataSender = NULL;
 
     //Delete child thread
-    trdTCPDataSender->deleteLater();
-    trdTCPDataSender = NULL;
+    trdTCPDataSenderThread->deleteLater();
+    trdTCPDataSenderThread = NULL;
 }
 
 /* Options Management */
