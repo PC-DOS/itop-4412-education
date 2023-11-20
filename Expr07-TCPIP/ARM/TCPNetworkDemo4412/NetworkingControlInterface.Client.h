@@ -61,7 +61,7 @@ private:
     bool bIsUserInitiatedDisconnection; //INTERNAL: Marks if user has initiated a disconnection, to avoid unexpected TryReconnect() flooding
     bool bIsReconnecting; //INTERNAL: Marks if we are alreading waiting a reconnection, to avoid unexpected TryReconnect() flooding
     volatile bool bIsDataSending; //INTERNAL: Marks if we are sending data, avoid recursive calling of SendDataToServerRequestedEventHandler() and segmentation faults
-    volatile bool bIsDataSendingStopRequested; //INTERNAL: Marks if controller has requested to stop data sending
+    bool bIsDataSendingStopRequested; //INTERNAL: Marks if controller has requested to stop data sending
 
 private slots:
     /* TCP Socket Event Handler Slots */
